@@ -23,11 +23,11 @@ Valider la logique de traitement **avant le passage au cluster Big Data** en app
 
 ```
 SE3-etl-batch/
-├── README.md                        ← Ce fichier
+├── README_sprint1.md                        ← Ce fichier
 ├── data/
 │   ├── mock_yelp_data.csv           ← Dataset MOCK brut 
 │   └── mock_yelp_data_cleaned.csv   ← Dataset nettoyé 
-└──
+└──sprint1
     └── s1_cleaning_pandas.py        ← Script de nettoyage Pandas
 ```
 
