@@ -1,0 +1,118 @@
+================================================================
+          ARCHITECTURE DU SYSTÈME BIG DATA
+================================================================
+
+L'architecture globale du système combine deux modes de traitement
+complémentaires afin de gérer à la fois les données en temps réel
+et les données historiques. Les données viennent d'abord d'une source
+(une dataset), puis envoyées vers Kafka, qui agit comme point d'entrée
+et système de diffusion des flux. Une partie des données est stockée
+de manière durable dans HDFS pour permettre un traitement ultérieur
+et conserver l'historique complet.
+
+À partir de là, le système se divise en deux couches principales :
+
+----------------------------------------------------------------
+1. COUCHE STREAMING (TEMPS RÉEL)
+----------------------------------------------------------------
+La couche streaming permet de traiter les données dès leur arrivée.
+Les données sont consommées directement depuis Kafka par des jobs
+Apache Flink en mode streaming, ce qui permet un traitement continu
+et instantané.
+
+Une fois traitées, les données sont envoyées vers ClickHouse.
+
+----------------------------------------------------------------
+2. COUCHE BATCH
+----------------------------------------------------------------
+La couche batch permet de traiter les données de manière globale
+et différée à partir des données stockées dans HDFS.
+
+Les jobs Apache Spark en mode batch lisent les données depuis HDFS
+et appliquent un processus ETL progressif afin de les rendre
+cohérentes et exploitables.
+
+Une fois le traitement terminé, les données peuvent être :
+  - Réécrites dans HDFS pour conserver l'historique
+  - Envoyées vers ClickHouse pour la couche de visualisation
+
+----------------------------------------------------------------
+3. COUCHE VISUALISATION (SERVING LAYER)
+----------------------------------------------------------------
+Les données sont stockées dans Apache ClickHouse, puis interrogées
+par Apache Grafana pour créer des visualisations dynamiques
+(dashboards et graphiques).
+
+================================================================
+          SCHÉMA DE L'ARCHITECTURE (ASCII)
+================================================================
+
+  +----------+    +-------------------------------+    +---------------------+    +--------------------+
+  |          |    |    Ingestion (temps réel)     |    |   Streaming Layer   |    |   Serving Layer    |
+  |  Sources +---->  Producers: Python > Kafka   +---->   Apache Flink      +---->      Grafana       |
+  |          |    |                               |    |                     |    |         ^          |
+  +----------+    +---------------+---------------+    +---------------------+    |         |          |
+                                  |                                               |  Apache ClickHouse |
+                                  | (stockage)                                    |         ^          |
+                                  v                                               +----+----+----------+
+                    +----------------------------+                                     |
+                    |   Apache HDFS : Data Lake  |    +---------------------+          |
+                    |   YARN : Resource Manager  +---->    Batch Layer      +----------+
+                    |                            <----+   Apache Spark      |
+                    +----------------------------+    +---------------------+
+
+  Flux de données :
+  ─────────────────
+  Sources
+    └──> Producers Python ──> Apache Kafka
+               │
+               ├──> [Streaming] Apache Flink ──> Apache ClickHouse ──> Grafana
+               │
+               └──> Apache HDFS (Data Lake / YARN)
+                          │
+                          ├──> [Batch] Apache Spark ──> Apache ClickHouse ──> Grafana
+                          │
+                          └──> (réécriture après traitement Spark)
+
+================================================================
+     CHOIX DES FRAMEWORKS ET TECHNOLOGIES DU SYSTÈME
+================================================================
+
++----------------------+----------------------------------+----------------------------------+
+| Technologie          | Rôle dans le pipeline            | Justification du choix           |
++----------------------+----------------------------------+----------------------------------+
+| Hadoop 3             | Infrastructure de base.          | Stockage fiable et distribué,    |
+| (HDFS + YARN)        | Stockage distribué (HDFS)        | scalabilité, tolérance aux       |
+|                      | + gestion ressources (YARN)      | pannes, intégration facile.      |
++----------------------+----------------------------------+----------------------------------+
+| Apache Kafka         | Bus de messagerie.               | Gestion de grands volumes en     |
+|                      | Ingestion et diffusion des       | continu, faible latence,         |
+|                      | données en temps réel.           | découplage producteurs/          |
+|                      |                                  | consommateurs, scalable.         |
++----------------------+----------------------------------+----------------------------------+
+| Apache Spark         | Framework de traitement          | Hautes performances sur grands   |
+|                      | distribué batch.                 | volumes stockés, traitement      |
+|                      | Nettoyage, transformation,       | distribué rapide sur HDFS,       |
+|                      | agrégation sur HDFS.             | optimisé pour ETL complexes.     |
++----------------------+----------------------------------+----------------------------------+
+| Apache Flink         | Framework de traitement          | Vrai streaming continu, faible   |
+|                      | distribué temps réel.            | latence, bonne gestion des       |
+|                      | Consomme les flux Kafka,         | événements, grande scalabilité.  |
+|                      | transformations en continu.      |                                  |
++----------------------+----------------------------------+----------------------------------+
+| Apache ClickHouse    | Base de données analytique       | Performances OLAP exceptionnelles|
+|                      | OLAP orientée colonnes.          | (100x à 1000x plus rapide),      |
+|                      | Stocke données traitées          | compatible Docker, 100% open     |
+|                      | (streaming & batch).             | source, API REST pour Grafana.   |
++----------------------+----------------------------------+----------------------------------+
+| Grafana              | Outil de visualisation / BI.     | 100+ visualisations, rafraîch.   |
+|                      | Se connecte à ClickHouse         | temps réel configurable,         |
+|                      | pour dashboards interactifs.     | alerting intégré, open source,   |
+|                      |                                  | plugin officiel ClickHouse.      |
++----------------------+----------------------------------+----------------------------------+
+| Docker Compose       | Orchestration du cluster local.  | Simplifie le déploiement en      |
+|                      | Déploie et gère tous les         | automatisant le lancement et     |
+|                      | services depuis un seul fichier. | la coordination des services.    |
++----------------------+----------------------------------+----------------------------------+
+
+================================================================
