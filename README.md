@@ -1,6 +1,6 @@
 # BigDataGroupe1 — Projet Big Data (synthèse)
 
-Ce dépôt contient plusieurs sous-projets et environnements pour un projet pédagogique Big Data (Yelp mock data).
+Ce dépôt contient plusieurs sous-projets et environnements pour le projet 2 Big Data (Yelp mock data).
 
 Structure générale
 
