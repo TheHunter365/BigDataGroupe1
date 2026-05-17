@@ -11,7 +11,7 @@ Déployé via **Docker Compose** — Hadoop 3.2.1 avec HDFS et YARN.
 | `namenode`        | Gestionnaire HDFS                | `9870` |
 | `datanode1/2`     | Stockage distribué (x2)          | —      |
 | `resourcemanager` | Gestionnaire des ressources YARN | `8088` |
-| `nodemanager1`    | Exécuteur de tâches YARN         | —      |
+| `nodemanager1/2`    | Exécuteur de tâches YARN  (x2)        | —      |
 | `historyserver`   | Historique des jobs              | —      |
 
 ---
