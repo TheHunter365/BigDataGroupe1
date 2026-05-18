@@ -39,7 +39,7 @@ Ce dépôt contient l'infrastructure de messagerie distribuée développée par 
 pip install kafka-python
 ```
 
-- Fichiers de données Yelp (à placer dans le même répertoire que `producer_final.py`) :
+- Fichiers de données Yelp (à placer dans `data/sample/`) :
   - `yelp_academic_dataset_business.json`
   - `mock_review.json`
 
@@ -68,7 +68,7 @@ Attendre que le cluster affiche le statut **Online** avant de continuer.
 ### 3. Lancer le Producer Python
 
 ```bash
-python producer_final.py
+python ingestion/producer_final.py
 ```
 
 ---
@@ -139,9 +139,10 @@ Kafka joue le rôle de tampon (buffer) entre les équipes. Si SE2 ingère à 1 0
 ```
 .
 ├── docker-compose.yml          # Infrastructure Kafka (KRaft + Kafka UI)
-├── producer_final.py           # Script d'ingestion (Batch + Streaming)
-├── yelp_academic_dataset_business.json   # Données Business Yelp (à fournir)
-└── mock_review.json            # Données Reviews (échantillon, à fournir)
+├── ingestion/producer_final.py # Script d'ingestion (Batch + Streaming)
+└── data/sample/
+    ├── yelp_academic_dataset_business.json   # Données Business Yelp (à fournir)
+    └── mock_review.json                      # Données Reviews (échantillon, à fournir)
 ```
 
 ---
@@ -151,6 +152,6 @@ Kafka joue le rôle de tampon (buffer) entre les équipes. Si SE2 ingère à 1 0
 1. `docker-compose up -d`
 2. Attendre 45 secondes
 3. Vérifier **http://localhost:8080** → statut Online
-4. `python producer_final.py`
+4. `python ingestion/producer_final.py`
 
 > Ne jamais lancer le Producer immédiatement après `docker-compose up`. Le port 9092 est exposé avant que Kafka soit réellement prêt à accepter des connexions.

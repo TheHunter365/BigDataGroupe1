@@ -7,7 +7,7 @@ CREATE DATABASE IF NOT EXISTS bigdata_db;
 
 USE bigdata_db;
 
--- ── Table principale : avis Yelp (même format que SE2/SE4) ───
+-- ── Table principale : avis Yelp (même format que ingestion/streaming) ───
 CREATE TABLE IF NOT EXISTS reviews (
     review_id   String,
     user_id     String,

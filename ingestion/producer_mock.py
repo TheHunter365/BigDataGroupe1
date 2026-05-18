@@ -1,13 +1,15 @@
 import json  # Bibliothèque pour manipuler les données au format JSON
 import time  # Bibliothèque pour gérer le temps (utilisée ici pour la simulation)
+from pathlib import Path
 
 # ==============================================================================
 # CONFIGURATION DES FICHIERS SOURCES
 # ==============================================================================
-# Les chemins vers nos fichiers de données. 
-# Ces fichiers doivent être dans le même dossier que ce script Python.
-business_file = 'yelp_academic_dataset_business.json'
-review_mock_file = 'mock_review.json'
+# Les chemins vers nos fichiers de données.
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR.parent / "data" / "sample"
+business_file = DATA_DIR / "yelp_academic_dataset_business.json"
+review_mock_file = DATA_DIR / "mock_review.json"
 
 print("🚀 DÉMARRAGE DE L'INGESTION DES DONNÉES (OFFLINE MOCK)\n" + "="*50)
 

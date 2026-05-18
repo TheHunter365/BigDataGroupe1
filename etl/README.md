@@ -22,13 +22,13 @@ Valider la logique de traitement **avant le passage au cluster Big Data** en app
 ##  Structure du dossier
 
 ```
-SE3-etl-batch/
-├── README_sprint1.md                        ← Ce fichier
-├── data/
-│   ├── mock_yelp_data.csv           ← Dataset MOCK brut 
-│   └── mock_yelp_data_cleaned.csv   ← Dataset nettoyé 
-└──sprint1
-    └── s1_cleaning_pandas.py        ← Script de nettoyage Pandas
+etl/
+├── README.md                              ← Ce fichier
+├── sprint1/
+│   └── S1_cleaning_pandas.py              ← Script de nettoyage Pandas
+└── ../data/sample/
+    ├── mock_yelp_data.csv                 ← Dataset MOCK brut
+    └── mock_yelp_data_cleaned.csv         ← Dataset nettoyé
 ```
 
 ##  Stack Technique — Sprint 1
@@ -60,11 +60,10 @@ python -c "import pandas; print(pandas.__version__)"
 ##  Exécution
 
 ```bash
-cd sprint1
-python s1_cleaning_pandas.py
+python etl/sprint1/S1_cleaning_pandas.py
 ```
 
-Le script lit `../data/mock_yelp_data.csv` et produit `../data/mock_yelp_data_cleaned.csv`.
+Le script lit `data/sample/mock_yelp_data.csv` et produit `data/sample/mock_yelp_data_cleaned.csv`.
 
 ---
 

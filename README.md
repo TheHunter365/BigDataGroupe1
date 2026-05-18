@@ -4,10 +4,12 @@ Ce dépôt contient plusieurs sous-projets et environnements pour le projet 2 Bi
 
 Structure générale
 
-- `SE1-Infrastructure/` — Déploiement Docker Compose d'un cluster Hadoop/YARN (HDFS, ResourceManager, DataNodes). Voir [SE1-Infrastructure/README.md](SE1-Infrastructure/README.md).
-- `SE2/` — Simulation d'ingestion : scripts et fichiers mock pour produire des données Yelp (producteur offline). Voir [SE2/README.md](SE2/README.md).
-- `SE3-etl-batch/` — Sprint 1 : scripts de nettoyage local (Pandas) et jeux de données mock. Voir [SE3-etl-batch/README.md](SE3-etl-batch/README.md).
-- `SE4/` — Intégration Flink + Kafka ; contient un `Dockerfile` et un `docker-compose.yml` pour lancer Kafka, Flink et des conteneurs producteurs/consommateurs. Voir [SE4/README.md](SE4/README.md).
+- `ingestion/` — Scripts d'ingestion (mock + Kafka). Voir [ingestion/README.md](ingestion/README.md) et [ingestion/README-kafka.md](ingestion/README-kafka.md).
+- `etl/` — Jobs de transformation batch (Pandas). Voir [etl/README.md](etl/README.md).
+- `streaming/` — Pipeline temps réel (Flink + Kafka). Voir [streaming/README.md](streaming/README.md).
+- `dashboard/` — Configs BI / notebooks. Voir [dashboard/README.md](dashboard/README.md).
+- `data/sample/` — Données mock (CSV/JSON).
+- `docs/` — Schémas d’architecture et rapports (incl. documentation d’infrastructure).
 
 - `docker-compose.yml` (racine) — orchestration globale (optionnelle selon configuration locale).
 
@@ -17,5 +19,5 @@ But : fournir un environnement reproductible pour tester des pipelines d'ingesti
 
 Prérequis globaux
 
-- Docker & docker-compose installés pour lancer les environnements `SE1` et `SE4`.
-- Python 3.8+ pour exécuter les scripts locaux dans `SE2` et `SE3`
+- Docker & docker-compose installés pour lancer les environnements d’ingestion et streaming.
+- Python 3.8+ pour exécuter les scripts locaux d’ingestion et d’ETL.
