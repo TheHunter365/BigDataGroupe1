@@ -1,7 +1,14 @@
+from pathlib import Path
+
 import pandas as pd
 
 # --- 1. Chargement ---
-df = pd.read_csv("mock_yelp_data.csv")
+ROOT_DIR = Path(__file__).resolve().parents[2]
+DATA_DIR = ROOT_DIR / "data" / "sample"
+input_path = DATA_DIR / "mock_yelp_data.csv"
+output_path = DATA_DIR / "mock_yelp_data_cleaned.csv"
+
+df = pd.read_csv(input_path)
 print(f"[INFO] Lignes avant nettoyage : {len(df)}")
 
 
@@ -54,5 +61,5 @@ for col in ["name", "city", "state"]:
 print(f"\n[INFO] Lignes après nettoyage complet : {len(df)}")
 
 # --- Export ---
-df.to_csv("mock_yelp_clean_S1.csv", index=False)
-print("[OK] Fichier 'mock_yelp_clean_S1.csv' sauvegardé.")
+df.to_csv(output_path, index=False)
+print("[OK] Fichier 'mock_yelp_data_cleaned.csv' sauvegardé.")

@@ -205,7 +205,7 @@ S2_M1/
 ├── docker-compose.yml       → Infrastructure complète (Kafka + ClickHouse + Grafana)
 ├── setup-s2.sh              → Script de démarrage automatisé
 ├── kafka-pipeline.sql       → Référence des tables ClickHouse (schemas complets)
-├── mock-producer.py         → Simulateur de données SE2/SE4
+├── mock-producer.py         → Simulateur de données ingestion/streaming
 ├── requirements.txt         → Dépendances Python
 ├── init-db.sql              → Données mock statiques S1 (auto-chargées)
 ├── provisioning/            → Configuration automatique Grafana (datasource ClickHouse)

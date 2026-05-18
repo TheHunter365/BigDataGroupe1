@@ -9,10 +9,12 @@ Le script `producer_mock.py` joue le rôle d'un **producteur Kafka offline** : i
 
 ```
 .
-├── producer_mock.py                    # Script principal d'ingestion
-├── mock_review.json                    # Échantillon de 100 avis (JSONL)
-├── yelp_academic_dataset_business.json # Dataset complet des entreprises (~118 MB, JSONL)
-└── README.md
+├── ingestion/
+│   ├── producer_mock.py                  # Script principal d'ingestion
+│   └── README.md
+└── data/sample/
+    ├── mock_review.json                  # Échantillon de 100 avis (JSONL)
+    └── yelp_academic_dataset_business.json # Dataset complet des entreprises (~118 MB, JSONL)
 ```
 
 ---
@@ -83,10 +85,10 @@ cd <nom-du-repo>
 
 ### Lancement
 
-Placez les deux fichiers de données dans le même répertoire que le script, puis :
+Les fichiers de données sont attendus dans `data/sample/`. Depuis la racine du dépôt :
 
 ```bash
-python producer_mock.py
+python ingestion/producer_mock.py
 ```
 
 ### Exemple de sortie

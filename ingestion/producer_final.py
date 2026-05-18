@@ -8,11 +8,14 @@
 
 import json
 import time
+from pathlib import Path
 from kafka import KafkaProducer  # Bibliothèque pour interagir avec Apache Kafka
 
 # Chemins vers les fichiers de données extraits de Kaggle
-business_file = 'yelp_academic_dataset_business.json'
-review_mock_file = 'mock_review.json'
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR.parent / "data" / "sample"
+business_file = DATA_DIR / "yelp_academic_dataset_business.json"
+review_mock_file = DATA_DIR / "mock_review.json"
 
 print("🚀 DÉMARRAGE DE L'INGESTION VERS KAFKA...\n" + "="*50)
 
