@@ -12,7 +12,7 @@
       }
     ]
   },
-  "description": "SE5 — Dashboard Big Data Mock · Groupe 1 · SNIA S2 · FSR Rabat",
+  "description": "SE5 — Dashboard Big Data Yelp Mock · Groupe 1 · SNIA S2 · FSR Rabat",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -36,12 +36,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "orange", "value": 500 },
-              { "color": "green", "value": 1000 }
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 100 }
             ]
-          },
-          "unit": "currencyUSD"
+          }
         },
         "overrides": []
       },
@@ -52,20 +50,16 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
         "textMode": "auto"
       },
-      "title": "💰 Revenu Total",
+      "title": "💬 Total Avis",
       "type": "stat",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT sum(total_revenue) AS revenue FROM bigdata_db.daily_kpi",
+          "rawSql": "SELECT count() AS reviews FROM bigdata_db.reviews",
           "refId": "A"
         }
       ]
@@ -75,14 +69,18 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
+          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "blue", "value": null },
-              { "color": "green", "value": 50 }
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 3 },
+              { "color": "green", "value": 4 }
             ]
-          }
+          },
+          "min": 1,
+          "max": 5
         },
         "overrides": []
       },
@@ -93,20 +91,16 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
         "textMode": "auto"
       },
-      "title": "🛒 Total Achats",
+      "title": "⭐ Note Moyenne",
       "type": "stat",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT sum(total_purchases) AS purchases FROM bigdata_db.daily_kpi",
+          "rawSql": "SELECT round(avg(stars), 2) AS avg_stars FROM bigdata_db.reviews",
           "refId": "A"
         }
       ]
@@ -120,8 +114,7 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "purple", "value": null },
-              { "color": "green", "value": 100 }
+              { "color": "green", "value": null }
             ]
           }
         },
@@ -134,20 +127,16 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
         "textMode": "auto"
       },
-      "title": "👆 Total Clics",
+      "title": "👍 Avis Positifs (≥ 4★)",
       "type": "stat",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT sum(total_clicks) AS clicks FROM bigdata_db.daily_kpi",
+          "rawSql": "SELECT countIf(stars >= 4) AS positive FROM bigdata_db.reviews",
           "refId": "A"
         }
       ]
@@ -157,17 +146,13 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "decimals": 1,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 10 },
-              { "color": "green", "value": 20 }
+              { "color": "red", "value": null }
             ]
-          },
-          "unit": "percent"
+          }
         },
         "overrides": []
       },
@@ -178,20 +163,16 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["mean"],
-          "fields": "",
-          "values": false
-        },
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
         "textMode": "auto"
       },
-      "title": "📈 Taux de Conversion Moyen",
+      "title": "👎 Avis Négatifs (≤ 2★)",
       "type": "stat",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT avg(conversion_rate) AS conv_rate FROM bigdata_db.daily_kpi",
+          "rawSql": "SELECT countIf(stars <= 2) AS negative FROM bigdata_db.reviews",
           "refId": "A"
         }
       ]
@@ -211,33 +192,29 @@
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "Revenu ($)",
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "scheme",
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 6,
-            "showPoints": "auto",
-            "spanNulls": false
-          },
-          "unit": "currencyUSD"
+            "axisLabel": "Nombre d'avis",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1,
+            "stacking": { "group": "A", "mode": "normal" }
+          }
         },
         "overrides": []
       },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
       "id": 5,
       "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" },
+        "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "bottom" },
         "tooltip": { "mode": "multi", "sort": "desc" }
       },
-      "title": "💹 Revenu Quotidien",
+      "title": "📅 Nombre d'Avis par Jour",
       "type": "timeseries",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT toDateTime(date) AS time, total_revenue AS \"Revenu\" FROM bigdata_db.daily_kpi ORDER BY date",
+          "rawSql": "SELECT toStartOfDay(date) AS time, count() AS \"Avis\" FROM bigdata_db.reviews GROUP BY time ORDER BY time",
           "refId": "A"
         }
       ]
@@ -250,28 +227,34 @@
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "gradientMode": "hue",
-            "lineWidth": 1,
-            "stacking": { "group": "A", "mode": "normal" }
-          }
+            "axisLabel": "Note (étoiles)",
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "spanNulls": false
+          },
+          "min": 1,
+          "max": 5
         },
         "overrides": []
       },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
       "id": 6,
       "options": {
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+        "legend": { "calcs": ["mean", "min", "max"], "displayMode": "table", "placement": "bottom" },
         "tooltip": { "mode": "multi", "sort": "desc" }
       },
-      "title": "📊 Événements par Jour (Stacked)",
+      "title": "⭐ Note Moyenne par Jour",
       "type": "timeseries",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT toDateTime(date) AS time, total_clicks AS \"Clics\", total_views AS \"Vues\", total_purchases AS \"Achats\" FROM bigdata_db.daily_kpi ORDER BY date",
+          "rawSql": "SELECT toStartOfDay(date) AS time, round(avg(stars), 2) AS \"Note Moyenne\" FROM bigdata_db.reviews GROUP BY time ORDER BY time",
           "refId": "A"
         }
       ]
@@ -280,7 +263,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
       "id": 102,
-      "title": "🌍 Répartition Géographique & Catégories",
+      "title": "🏪 Analyse par Business & Sentiment",
       "type": "row"
     },
     {
@@ -300,13 +283,49 @@
         "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
         "tooltip": { "mode": "single", "sort": "none" }
       },
-      "title": "🌍 Répartition par Pays (Événements)",
+      "title": "⭐ Distribution des Notes (1→5★)",
       "type": "piechart",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT country, count() AS events FROM bigdata_db.mock_events GROUP BY country ORDER BY events DESC",
+          "rawSql": "SELECT concat(toString(toUInt8(stars)), ' etoile(s)') AS Note, count() AS Nb FROM bigdata_db.reviews GROUP BY stars ORDER BY stars DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Avis",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1,
+            "barAlignment": 0
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
+      "id": 8,
+      "options": {
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" },
+        "orientation": "horizontal"
+      },
+      "title": "🏆 Top Businesses par Nombre d'Avis",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+          "queryType": "sql",
+          "rawSql": "SELECT business_id AS \"Business\", count() AS \"Nb Avis\" FROM bigdata_db.reviews GROUP BY business_id ORDER BY \"Nb Avis\" DESC",
           "refId": "A"
         }
       ]
@@ -320,57 +339,21 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
-      "id": 8,
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+      "id": 9,
       "options": {
         "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
-        "pieType": "donut",
+        "pieType": "pie",
         "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
         "tooltip": { "mode": "single", "sort": "none" }
       },
-      "title": "📦 Revenu par Pays ($)",
+      "title": "😊 Répartition Sentiment",
       "type": "piechart",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT country, sum(value) AS revenue FROM bigdata_db.mock_events WHERE event_type = 'purchase' GROUP BY country ORDER BY revenue DESC",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Nombre",
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "gradientMode": "hue",
-            "lineWidth": 1,
-            "barAlignment": 0
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
-      "id": 9,
-      "options": {
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
-        "tooltip": { "mode": "single", "sort": "none" },
-        "orientation": "horizontal"
-      },
-      "title": "🏆 Top Pays par Nombre d'Achats",
-      "type": "barchart",
-      "targets": [
-        {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
-          "queryType": "sql",
-          "rawSql": "SELECT country AS \"Pays\", count() AS \"Achats\" FROM bigdata_db.mock_events WHERE event_type = 'purchase' GROUP BY country ORDER BY \"Achats\" DESC",
+          "rawSql": "SELECT multiIf(stars >= 4, 'Positif', stars <= 2, 'Negatif', 'Neutre') AS Sentiment, count() AS Nb FROM bigdata_db.reviews GROUP BY Sentiment ORDER BY Nb DESC",
           "refId": "A"
         }
       ]
@@ -379,7 +362,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
       "id": 103,
-      "title": "📋 Détails & Métriques Avancées",
+      "title": "📋 Métriques Avancées & Résumé",
       "type": "row"
     },
     {
@@ -388,15 +371,16 @@
         "defaults": {
           "color": { "mode": "thresholds" },
           "decimals": 2,
+          "min": 1,
+          "max": 5,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               { "color": "red", "value": null },
-              { "color": "yellow", "value": 100 },
-              { "color": "green", "value": 200 }
+              { "color": "yellow", "value": 3 },
+              { "color": "green", "value": 4 }
             ]
-          },
-          "unit": "currencyUSD"
+          }
         },
         "overrides": []
       },
@@ -404,17 +388,17 @@
       "id": 10,
       "options": {
         "orientation": "auto",
-        "reduceOptions": { "calcs": ["mean"], "fields": "", "values": false },
-        "showThresholdLabels": false,
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": true,
         "showThresholdMarkers": true
       },
-      "title": "🎯 Valeur Moyenne par Commande",
+      "title": "🎯 Note Moyenne Globale",
       "type": "gauge",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT avg(value) AS avg_order FROM bigdata_db.mock_events WHERE event_type = 'purchase'",
+          "rawSql": "SELECT avg(stars) AS avg_stars FROM bigdata_db.reviews",
           "refId": "A"
         }
       ]
@@ -428,7 +412,7 @@
             "mode": "absolute",
             "steps": [
               { "color": "blue", "value": null },
-              { "color": "green", "value": 20 }
+              { "color": "green", "value": 30 }
             ]
           }
         },
@@ -442,13 +426,13 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "title": "📱 Appareils Actifs (Unique)",
+      "title": "👤 Utilisateurs Uniques",
       "type": "gauge",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT uniqExact(device_id) AS devices FROM bigdata_db.mock_events",
+          "rawSql": "SELECT uniqExact(user_id) AS users FROM bigdata_db.reviews",
           "refId": "A"
         }
       ]
@@ -462,7 +446,7 @@
             "mode": "absolute",
             "steps": [
               { "color": "semi-dark-orange", "value": null },
-              { "color": "green", "value": 100 }
+              { "color": "green", "value": 50 }
             ]
           }
         },
@@ -478,13 +462,13 @@
         "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
         "textMode": "auto"
       },
-      "title": "📊 Total Événements",
+      "title": "🙌 Total Votes Utiles",
       "type": "stat",
       "targets": [
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT count() AS total FROM bigdata_db.mock_events",
+          "rawSql": "SELECT sum(useful) AS useful FROM bigdata_db.reviews",
           "refId": "A"
         }
       ]
@@ -501,19 +485,36 @@
           },
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null }
-            ]
+            "steps": [{ "color": "green", "value": null }]
           }
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "revenue" },
-            "properties": [{ "id": "unit", "value": "currencyUSD" }]
+            "matcher": { "id": "byName", "options": "avg_stars" },
+            "properties": [
+              { "id": "displayName", "value": "Note Moy." },
+              { "id": "decimals", "value": 2 }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "conv_rate" },
-            "properties": [{ "id": "unit", "value": "percent" }]
+            "matcher": { "id": "byName", "options": "positive_count" },
+            "properties": [{ "id": "displayName", "value": "Positifs" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "negative_count" },
+            "properties": [{ "id": "displayName", "value": "Negatifs" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "neutral_count" },
+            "properties": [{ "id": "displayName", "value": "Neutres" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "total_reviews" },
+            "properties": [{ "id": "displayName", "value": "Total Avis" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "total_useful" },
+            "properties": [{ "id": "displayName", "value": "Utiles" }]
           }
         ]
       },
@@ -521,7 +522,7 @@
       "id": 13,
       "options": {
         "showHeader": true,
-        "footer": { "show": true, "reducer": ["sum"], "fields": ["revenue", "purchases"] }
+        "footer": { "show": true, "reducer": ["sum"], "fields": ["total_reviews", "total_useful"] }
       },
       "title": "📋 Résumé Quotidien Détaillé",
       "type": "table",
@@ -529,7 +530,7 @@
         {
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
           "queryType": "sql",
-          "rawSql": "SELECT date, total_revenue AS revenue, total_clicks AS clicks, total_views AS views, total_purchases AS purchases, round(conversion_rate, 2) AS conv_rate, round(avg_order_value, 2) AS avg_order, active_devices AS devices FROM bigdata_db.daily_kpi ORDER BY date",
+          "rawSql": "SELECT date, total_reviews, round(avg_stars, 2) AS avg_stars, total_useful, positive_count, neutral_count, negative_count FROM bigdata_db.daily_stats ORDER BY date",
           "refId": "A"
         }
       ]
@@ -538,7 +539,7 @@
   "refresh": "30s",
   "schemaVersion": 38,
   "style": "dark",
-  "tags": ["SE5", "BigData", "Mock", "Groupe1"],
+  "tags": ["SE5", "BigData", "Yelp", "Mock", "Groupe1"],
   "templating": {
     "list": [
       {
@@ -563,7 +564,7 @@
   "time": { "from": "2026-04-27T00:00:00.000Z", "to": "2026-05-05T00:00:00.000Z" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "SE5 — Dashboard Big Data Mock",
-  "uid": "se5-bigdata-mock",
+  "title": "SE5 — Dashboard Yelp Mock",
+  "uid": "se5-bigdata-yelp",
   "version": 1
 }
