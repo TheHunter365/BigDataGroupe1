@@ -13,8 +13,6 @@ Structure générale
 
 - `docker-compose.yml` (racine) — orchestration globale (optionnelle selon configuration locale).
 
-But
-
 But : fournir un environnement reproductible pour tester des pipelines d'ingestion (mock), des traitements batch locaux et une infrastructure distribuée (Hadoop / Flink + Kafka) à des fins pédagogiques.
 
 Prérequis globaux
