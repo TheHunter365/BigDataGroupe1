@@ -248,8 +248,8 @@ services:
         condition: service_healthy
     volumes:
       - ./etl/scripts:/app/scripts
-      - ./se3-etl/data:/app/data
-      - ./se3-etl/output:/app/output
+      - ./etl/data:/app/data
+      - ./etl/output:/app/output
       - ./spark-defaults.conf:/spark/conf/spark-defaults.conf
     env_file:
       - ./hadoop.env

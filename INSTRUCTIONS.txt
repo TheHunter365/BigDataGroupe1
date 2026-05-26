@@ -21,6 +21,8 @@ BigDataGroupe1/
 ├── etl/                        ← Scripts ETL Spark (batch)
 │   ├── scripts/
 │   │   └── spark_etl.py        ← Script principal Spark à écrire ici
+│   ├── data/                   ← Données locales à injecter dans HDFS
+│   └── output/                 ← Résultats locaux (optionnel)
 │
 ├── streaming/                  ← Scripts Kafka + Flink (streaming)
 │   ├── Dockerfile              ← Image Python avec kafka-python, pyflink
