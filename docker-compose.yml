@@ -247,7 +247,7 @@ services:
       hdfs-init:
         condition: service_healthy
     volumes:
-      - ./se3-etl/scripts:/app/scripts
+      - ./etl/scripts:/app/scripts
       - ./se3-etl/data:/app/data
       - ./se3-etl/output:/app/output
       - ./spark-defaults.conf:/spark/conf/spark-defaults.conf

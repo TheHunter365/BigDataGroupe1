@@ -18,11 +18,9 @@ BigDataGroupe1/
 ├── hadoop.env                  ← Variables d'environnement Hadoop/YARN
 ├── spark-defaults.conf         ← Configuration Spark (YARN + HDFS + logs)
 │
-├── se3-etl/                    ← Scripts ETL Spark (batch)
+├── etl/                        ← Scripts ETL Spark (batch)
 │   ├── scripts/
 │   │   └── spark_etl.py        ← Script principal Spark à écrire ici
-│   ├── data/                   ← Données locales à injecter dans HDFS
-│   └── output/                 ← Résultats locaux (optionnel)
 │
 ├── streaming/                  ← Scripts Kafka + Flink (streaming)
 │   ├── Dockerfile              ← Image Python avec kafka-python, pyflink
@@ -229,9 +227,9 @@ NOTES :
     (Kafka UI → Topics → yelp-reviews-mock → Messages)
 
 ---------------------------------------------------------------------------
-  SE3 — ETL BATCH SPARK — fichier : se3-etl/scripts/spark_etl.py
+  SE3 — ETL BATCH SPARK — fichier : etl/scripts/spark_etl.py
 ---------------------------------------------------------------------------
-le script doit etre dans se3-etl/scripts/spark_etl.py selon la configuration, sinon vous pouvez changer la configuration si vous voulez ecrire votre script dans un autre emplacement
+le script doit etre dans etl/scripts/spark_etl.py selon la configuration, sinon vous pouvez changer la configuration si vous voulez ecrire votre script dans un autre emplacement
 
 RÔLE : Lire les données brutes depuis HDFS, les transformer, et écrire
        les résultats dans les répertoires /data/processed/* sur HDFS.
