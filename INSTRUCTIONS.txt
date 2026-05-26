@@ -1,0 +1,399 @@
+===========================================================================
+  GUIDE TECHNIQUE — ARCHITECTURE LAMBDA BIG DATA
+  Projet BigDataGroupe1
+  Date : Mai 2026
+===========================================================================
+
+Ce guide explique en détail la configuration de l'infrastructure, les choix
+techniques effectués, et où chaque membre du groupe doit écrire ses scripts.
+
+
+===========================================================================
+  PARTIE 1 — STRUCTURE DU PROJET
+===========================================================================
+
+BigDataGroupe1/
+│
+├── docker-compose.yml          ← Orchestration de tous les services
+├── hadoop.env                  ← Variables d'environnement Hadoop/YARN
+├── spark-defaults.conf         ← Configuration Spark (YARN + HDFS + logs)
+│
+├── etl/                        ← Scripts ETL Spark (batch)
+│   ├── scripts/
+│   │   └── spark_etl.py        ← Script principal Spark à écrire ici
+│   ├── data/                   ← Données locales à injecter dans HDFS
+│   └── output/                 ← Résultats locaux (optionnel)
+│
+├── streaming/                  ← Scripts Kafka + Flink (streaming)
+│   ├── Dockerfile              ← Image Python avec kafka-python, pyflink
+│   ├── kafka-producer.py       ← Producteur Kafka (SE2) à écrire ici
+│   └── flink.py                ← Consommateur Flink (SE4) à écrire ici
+│
+└── dashboard/                  ← Visualisation (SE5)
+    ├── init-db.sql             ← Création des tables ClickHouse
+    ├── provisioning/
+    │   ├── datasources/        ← Connexion Grafana → ClickHouse
+    │   └── dashboards/         ← Chargement automatique des dashboards
+    └── dashboards/
+        └── se5-dashboard.json  ← Dashboard Grafana principal
+
+
+===========================================================================
+  PARTIE 2 — FICHIERS DE CONFIGURATION
+===========================================================================
+
+---------------------------------------------------------------------------
+  2.1 — docker-compose.yml
+---------------------------------------------------------------------------
+
+Le docker-compose.yml orchestre 5 sous-systèmes (SE1 à SE5) sur un réseau
+Docker commun appelé "bigdata-network".
+
+RÉSEAU :
+  Tous les conteneurs communiquent via le réseau bridge "bigdata-network".
+  Les conteneurs se contactent par leur nom de service (ex: "namenode",
+  "kafka", "clickhouse") — pas par IP.
+
+VOLUMES PERSISTANTS :
+  hadoop_namenode, hadoop_datanode1, hadoop_datanode2 → données HDFS
+  hadoop_historyserver → historique YARN
+  spark-events → répertoire local /tmp/spark-events dans spark-history
+  clickhouse-data, clickhouse-logs → données ClickHouse
+  grafana-data → dashboards et config Grafana
+
+
+DÉPENDANCES ENTRE SERVICES (ordre de démarrage) :
+  namenode → healthy
+    ↓
+  datanode1, datanode2 → started
+    ↓
+  resourcemanager → healthy
+    ↓
+  hdfs-init → healthy (crée toute l'arborescence HDFS)
+    ↓
+  spark-history, spark-submit-job → démarrent
+  
+  kafka → healthy (après 60s start_period)
+    ↓
+  jobmanager, taskmanager, python-producer, python-flink → démarrent
+
+  clickhouse → healthy
+    ↓
+  grafana → démarre
+
+---------------------------------------------------------------------------
+  2.2 — hadoop.env
+---------------------------------------------------------------------------
+
+Ce fichier configure les trois composants Hadoop injectés dans tous les
+conteneurs bde2020/* via "env_file: ./hadoop.env".
+
+CORE :
+  fs.defaultFS=hdfs://namenode:9000
+    → Adresse du système de fichiers distribué. Tous les accès HDFS
+      sans préfixe explicite passeront par namenode:9000.
+
+  io.compression.codecs=SnappyCodec
+    → Compression Snappy activée pour les shuffles MapReduce/Spark.
+      Snappy est rapide (moins bon ratio que Gzip, mais bien plus rapide).
+
+HDFS :
+  dfs.replication=2
+    → Chaque bloc HDFS est répliqué sur 2 datanodes (datanode1 + datanode2).
+      Avec seulement 2 datanodes, c'est le maximum possible.
+
+  dfs.permissions.enabled=false
+    → Désactive les contrôles de permissions HDFS.
+      Simplifie le développement (tous les utilisateurs peuvent lire/écrire).
+
+  dfs.datanode.use.datanode.hostname=true
+    → FIX important : sans cette option, les redirections WebHDFS
+      retournent l'IP interne Docker, inaccessible depuis l'hôte.
+      Avec cette option, le hostname du conteneur est retourné.
+
+YARN :
+  yarn.nodemanager.resource.memory-mb=8192
+    → Chaque NodeManager offre 8 Go de RAM aux applications YARN.
+
+  yarn.scheduler.maximum-allocation-mb=6144
+    → Un seul conteneur YARN peut demander au maximum 6 Go.
+
+  yarn.nodemanager.vmem-check-enabled=false
+    → Désactive la vérification de mémoire virtuelle.
+      Nécessaire sous Docker où la mémoire virtuelle est mal rapportée.
+
+MAPREDUCE :
+  mapreduce.framework.name=yarn
+    → MapReduce utilise YARN comme gestionnaire de ressources.
+
+  mapreduce.jobhistory.address=historyserver:10020
+    → Les logs des jobs MapReduce sont envoyés au History Server.
+
+---------------------------------------------------------------------------
+  2.3 — spark-defaults.conf
+---------------------------------------------------------------------------
+
+Ce fichier configure Spark pour tourner sur YARN avec HDFS.
+Il est monté dans /spark/conf/spark-defaults.conf dans les conteneurs
+se3-spark-submit et se3-spark-history.
+
+spark.master = yarn
+  → Spark soumet ses jobs à YARN (pas en mode standalone).
+    YARN gère l'allocation des ressources sur les NodeManagers.
+
+spark.submit.deployMode = client
+  → Le driver Spark tourne dans le conteneur se3-spark-submit
+    (pas dans un conteneur YARN séparé). Plus simple pour déboguer.
+
+spark.driver.memory = 1g
+spark.executor.memory = 1g
+spark.executor.memoryOverhead = 1024m
+  → Mémoire allouée au driver et à chaque exécuteur.
+    L'overhead couvre la mémoire off-heap (JVM, buffers natifs).
+
+spark.executor.cores = 2
+spark.executor.instances = 2
+  → 2 exécuteurs avec 2 cores chacun = 4 cores en parallèle.
+    Adapté à un cluster de 2 NodeManagers avec 4 vCores chacun.
+
+spark.sql.shuffle.partitions = 200
+  → Nombre de partitions lors d'un shuffle (join, groupBy).
+    200 est la valeur par défaut Spark, adaptée à 2 nœuds.
+
+spark.serializer = KryoSerializer
+  → Kryo est ~10x plus rapide que le sérialiseur Java par défaut.
+    Important pour les shuffles et la mise en cache des RDDs.
+
+spark.hadoop.fs.defaultFS = hdfs://namenode:9000
+  → Surcharge la config Hadoop pour que Spark accède à HDFS.
+
+spark.eventLog.enabled = true
+spark.eventLog.dir = hdfs://namenode:9000/spark/logs
+spark.history.fs.logDirectory = hdfs://namenode:9000/spark/logs
+  → Active la journalisation des events Spark dans HDFS.
+    Le Spark History Server lit ce répertoire pour afficher les jobs.
+    IMPORTANT : utiliser hdfs://namenode:9000 explicitement (pas hdfs:///)
+    pour éviter les problèmes de résolution DNS dans les conteneurs.
+
+
+===========================================================================
+  PARTIE 3 — OÙ ÉCRIRE LES SCRIPTS PAR SOUS-SYSTÈME
+===========================================================================
+
+---------------------------------------------------------------------------
+  SE1 — INFRASTRUCTURE (HDFS + YARN) — Pas de script à écrire
+---------------------------------------------------------------------------
+
+SE1 est entièrement géré par docker-compose.yml et hadoop.env.
+Le seul script "actif" est la commande dans hdfs-init qui crée
+l'arborescence HDFS au démarrage.
+
+Arborescence HDFS créée automatiquement :
+  /data/raw/business
+  /data/raw/review
+  /data/raw/user
+  /data/raw/checkin
+  /data/raw/tip
+  /data/processed/business_enriched
+  /data/processed/reviews_enriched
+  /data/processed/user_graph_metrics
+  /data/processed/checkins_exploded
+  /data/processed/axe1_reputation
+  /data/processed/axe2_geo
+  /data/processed/axe3_social
+  /data/processed/axe4_temporal
+  /spark/logs
+  /tmp/spark-events
+
+Pour vérifier HDFS depuis l'hôte :
+  → http://localhost:9870  (NameNode UI)
+  → http://localhost:8088  (YARN ResourceManager UI)
+
+---------------------------------------------------------------------------
+  SE2 — INGESTION KAFKA — fichier : streaming/kafka-producer.py
+---------------------------------------------------------------------------
+
+RÔLE : Produire des messages JSON dans le topic Kafka "yelp-reviews-mock".
+
+CONTENEUR : se4-python-producer (construit depuis ./streaming/Dockerfile)
+
+VARIABLES D'ENVIRONNEMENT DISPONIBLES :
+  KAFKA_BOOTSTRAP_SERVERS = kafka:29092
+  KAFKA_TOPIC = yelp-reviews-mock
+
+
+NOTES :
+  - Le script tourne en boucle infinie (streaming continu).
+  - Utiliser kafka:29092 (listener INTERNAL) et non localhost:9092.
+  - Pour vérifier que les messages arrivent : http://localhost:8080
+    (Kafka UI → Topics → yelp-reviews-mock → Messages)
+
+---------------------------------------------------------------------------
+  SE3 — ETL BATCH SPARK — fichier : etl/scripts/spark_etl.py
+---------------------------------------------------------------------------
+le script doit être dans etl/scripts/spark_etl.py selon la configuration, sinon vous pouvez changer la configuration si vous voulez écrire votre script dans un autre emplacement
+
+RÔLE : Lire les données brutes depuis HDFS, les transformer, et écrire
+       les résultats dans les répertoires /data/processed/* sur HDFS.
+
+CONTENEUR : se3-spark-submit
+  - Soumet le job Spark à YARN via spark-submit
+  - Utilise spark-defaults.conf pour la configuration
+
+ACCÈS HDFS :
+  Les données doivent être dans /data/raw/* sur HDFS.
+  Pour uploader des fichiers locaux vers HDFS :
+    docker exec namenode hdfs dfs -put /chemin/local /data/raw/business/
+
+
+NOTES :
+  - Le job est soumis automatiquement au démarrage du conteneur.
+  - Pour relancer manuellement :
+      docker restart se3-spark-submit
+  - Pour voir les logs du job Spark :
+      docker logs se3-spark-submit --follow
+  - Pour voir l'historique des jobs : http://localhost:18080
+
+---------------------------------------------------------------------------
+  SE4 — STREAM PROCESSING FLINK — fichier : streaming/flink.py
+---------------------------------------------------------------------------
+
+RÔLE : Consommer les messages du topic Kafka en temps réel, appliquer
+       des transformations, et écrire les résultats (ClickHouse ou HDFS).
+
+CONTENEUR : se4-python-flink (construit depuis ./streaming/Dockerfile)
+
+VARIABLES D'ENVIRONNEMENT DISPONIBLES :
+  KAFKA_BOOTSTRAP_SERVERS = kafka:29092
+  KAFKA_TOPIC = yelp-reviews-mock
+  FLINK_KAFKA_CONNECTOR_JAR = /opt/flink/lib/flink-sql-connector-kafka-3.3.0-1.19.jar
+
+
+NOTES :
+  - Le JobManager Flink est accessible sur http://localhost:8083
+  - Le TaskManager doit être visible dans l'UI (1 TM, 2 slots)
+  - Pour vérifier que le job tourne : http://localhost:8083/#/jobs/running
+
+---------------------------------------------------------------------------
+  SE5 — VISUALISATION — fichiers : dashboard/
+---------------------------------------------------------------------------
+
+RÔLE : Créer les tables ClickHouse, y insérer les données traitées,
+       et construire les dashboards Grafana.
+
+  -- FICHIER 1 : dashboard/init-db.sql --
+
+  Créé automatiquement au démarrage de ClickHouse.
+  Contient la création des tables qui recevront les données.
+
+
+  Pour vérifier ClickHouse directement :
+    curl http://localhost:8123/?query=SELECT+count()+FROM+bigdata_db.reputation_summary
+
+
+===========================================================================
+  PARTIE 4 — DÉMARRAGE ET COMMANDES UTILES
+===========================================================================
+
+DÉMARRAGE COMPLET (première fois ou après modification du compose) :
+
+  docker compose down
+
+  docker compose up -d
+
+  Note : Le démarrage complet prend ~3-4 minutes à cause de :
+    - Kafka KRaft : ~2 minutes (start_period: 60s protège ce délai)
+    - Hadoop NameNode : ~90 secondes
+    - hdfs-init : attend NameNode puis crée l'arborescence
+
+VÉRIFICATION DE L'ÉTAT :
+  docker compose ps
+
+  État attendu :
+    clickhouse-server   → Up (healthy)
+    namenode            → Up (healthy)
+    datanode1           → Up (healthy)
+    datanode2           → Up (healthy)
+    resourcemanager     → Up (healthy)
+    nodemanager1        → Up (healthy)
+    nodemanager2        → Up (healthy)
+    historyserver       → Up
+    hdfs-init           → Exited (0)   ← NORMAL, one-shot
+    kafka_se2           → Up (healthy)
+    kafka_ui_se2        → Up
+    se3-spark-history   → Up
+    se3-spark-submit    → Up ou Exited (0) selon fin du job
+    se4-jobmanager      → Up
+    se4-taskmanager     → Up
+    se4-python-producer → Up
+    se4-python-flink    → Up
+    grafana-se5         → Up
+
+
+
+VOIR LES LOGS D'UN SERVICE :
+  docker logs <nom_conteneur> --tail 50
+  docker logs <nom_conteneur> --follow   (temps réel)
+
+
+
+REDÉMARRER UN SERVICE SANS TOUT ARRÊTER :
+  docker compose restart <nom_service>
+  Note : ne recharge PAS les changements de volumes — utiliser down/up pour ça.
+
+
+
+ENTRER DANS UN CONTENEUR :
+  docker exec -it namenode bash
+  docker exec -it kafka_se2 bash
+
+
+
+VÉRIFIER L'ARBORESCENCE HDFS :
+  docker exec namenode hdfs dfs -ls -R /data
+  docker exec namenode hdfs dfs -ls /tmp
+
+
+
+UPLOADER UN FICHIER DANS HDFS :
+  docker exec -it namenode bash
+  hdfs dfs -put /chemin/local /data/raw/business/
+
+
+
+ARRÊT SANS PERDRE LES DONNÉES :
+  docker compose down
+  (les volumes Docker sont conservés)
+
+
+
+ARRÊT AVEC SUPPRESSION DES DONNÉES :
+  docker compose down -v
+  (supprime tous les volumes — repart de zéro)
+
+
+===========================================================================
+  PARTIE 5 — URLS D'ACCÈS AUX INTERFACES
+===========================================================================
+
+  Service                  URL                        Identifiants
+  -------                  ---                        ------------
+  HDFS NameNode UI         http://localhost:9870       —
+  YARN ResourceManager     http://localhost:8088       —
+  Kafka UI                 http://localhost:8080       —
+  Spark History Server     http://localhost:18080      —
+  Flink JobManager UI      http://localhost:8083       —
+  ClickHouse (ping)        http://localhost:8123/ping  → retourne "Ok."
+  Grafana                  http://localhost:3001       admin / admin123
+
+  Points de vérification :
+  - HDFS (9870)   → onglet Datanodes : datanode1 + datanode2 en Live
+  - YARN (8088)   → onglet Nodes : nodemanager1 + nodemanager2 actifs
+  - Kafka (8080)  → cluster "Cluster_Local_SE2" visible, topic créé
+  - Flink (8083)  → Task Managers : 1 TM avec 2 slots disponibles
+  - Grafana (3001)→ datasource ClickHouse connectée (statut vert)
+
+
+===========================================================================
+  FIN DU GUIDE
+===========================================================================
