@@ -29,7 +29,7 @@ def main():
     env.add_jars(f"file://{connector_jar}")
 
     bootstrap_servers = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
-    input_topic = os.getenv("KAFKA_TOPIC", "yelp-reviews-mock")
+    input_topic = os.getenv("KAFKA_TOPIC", "topic_reviews") 
     output_topic = "yelp-negative-reviews" # Le nouveau topic pour les alertes
 
     # 1. SOURCE
