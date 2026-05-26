@@ -231,7 +231,7 @@ NOTES :
 ---------------------------------------------------------------------------
   SE3 — ETL BATCH SPARK — fichier : etl/scripts/spark_etl.py
 ---------------------------------------------------------------------------
-le script doit etre dans etl/scripts/spark_etl.py selon la configuration, sinon vous pouvez changer la configuration si vous voulez ecrire votre script dans un autre emplacement
+le script doit être dans etl/scripts/spark_etl.py selon la configuration, sinon vous pouvez changer la configuration si vous voulez écrire votre script dans un autre emplacement
 
 RÔLE : Lire les données brutes depuis HDFS, les transformer, et écrire
        les résultats dans les répertoires /data/processed/* sur HDFS.
