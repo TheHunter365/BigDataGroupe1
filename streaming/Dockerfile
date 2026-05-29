@@ -20,9 +20,9 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # 2. Installation des bibliothèques Python nécessaires pour le Producer Kafka
 # kafka-python pour communiquer avec le broker et lz4 pour la compression
-RUN pip install --no-cache-dir \
+RUN pip install --no-cache-dir --default-timeout=1000\
     "apache-flink==1.20.0" \
-    kafka-python \
+    kafka-python-ng \
     lz4
 
 # 3. Préparation de l'environnement Flink et téléchargement du connecteur Kafka
@@ -33,8 +33,9 @@ RUN mkdir -p /opt/flink/lib \
 
 # 4. Copie des scripts Python (Producer et Flink) depuis le dossier 'streaming' vers le conteneur
 # Note : Ces fichiers doivent être copiés dans le répertoire de travail /app
-COPY flink.py kafka-producer.py ./
+COPY flink.py ./
 
 # 5. Définition de l'entrée par défaut (Python)
 # Le conteneur exécutera la commande par défaut avec le script spécifié dans le compose
 ENTRYPOINT ["python"]
+CMD ["flink.py"]
