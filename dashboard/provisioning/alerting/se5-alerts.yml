@@ -1,0 +1,135 @@
+apiVersion: 1
+
+# ══════════════════════════════════════════════════════════
+# SE5 — Alertes Grafana (Unified Alerting)
+# Provisionnées automatiquement au démarrage de Grafana
+# Grafana 9+ / 10 requis
+# ══════════════════════════════════════════════════════════
+
+groups:
+  - name: SE5 Alertes Yelp
+    folder: SE5 Alertes
+    interval: 1m
+    rules:
+
+      # ──────────────────────────────────────────────────
+      # Alerte 1 : Note moyenne live critique (< 2.0)
+      # Se déclenche si avg(stars) sur reviews_live < 2.0
+      # pendant 5 minutes consécutives
+      # ──────────────────────────────────────────────────
+      - uid: se5-alert-note-critique
+        title: "Note Live Critique (< 2.0 etoiles)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: clickhouse_se5
+            model:
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              queryType: sql
+              rawSql: "SELECT avg(stars) AS note FROM bigdata_db.reviews_live"
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: "__expr__"
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 2.0
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: "__expr__"
+              expression: A
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        for: 5m
+        labels:
+          severity: critical
+          team: SE5
+        annotations:
+          summary: "Note live < 2.0 etoiles"
+          description: "La note moyenne des avis en temps reel (reviews_live) est tombee sous 2.0 etoiles. Verifiez le flux Kafka et le job Flink."
+        noDataState: NoData
+        execErrState: Error
+        isPaused: false
+
+      # ──────────────────────────────────────────────────
+      # Alerte 2 : Pic d'alertes négatives Flink (> 50)
+      # Se déclenche si count() sur negative_alerts_live > 50
+      # pendant 2 minutes consécutives
+      # ──────────────────────────────────────────────────
+      - uid: se5-alert-pic-negatif
+        title: "Pic Alertes Negatives Flink (> 50)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: clickhouse_se5
+            model:
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              queryType: sql
+              rawSql: "SELECT count() AS alertes FROM bigdata_db.negative_alerts_live WHERE received_at >= now() - INTERVAL 5 MINUTE"
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: "__expr__"
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 50
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: "__expr__"
+              expression: A
+              hide: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        for: 2m
+        labels:
+          severity: warning
+          team: SE5
+        annotations:
+          summary: "Pic d'avis negatifs detecte par Flink"
+          description: "Plus de 50 alertes negatives enregistrees dans les 5 dernieres minutes. Le job Flink SE4 detecte une vague d'avis negatifs."
+        noDataState: NoData
+        execErrState: Error
+        isPaused: false

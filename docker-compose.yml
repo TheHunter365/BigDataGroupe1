@@ -474,6 +474,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./dashboard/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./dashboard/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./dashboard/provisioning/alerting:/etc/grafana/provisioning/alerting
       - ./dashboard/dashboards:/var/lib/grafana/dashboards
     depends_on:
       clickhouse:
