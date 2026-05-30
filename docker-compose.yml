@@ -323,7 +323,7 @@ services:
 #  SE3 — ETL SPARK SUR YARN
 # ===========================================================================
   spark-submit-job:
-    image: bde2020/spark-submit:3.3.0-hadoop3.3
+    image: bde2020/spark-base:3.2.0-hadoop3.2
     container_name: se3-spark-submit
     restart: "no"
     depends_on:
@@ -352,7 +352,7 @@ services:
       - bigdata-network
 
   spark-history:
-    image: bde2020/spark-history-server:3.3.0-hadoop3.3
+    image: bde2020/spark-history-server:3.2.0-hadoop3.2
     container_name: se3-spark-history
     restart: always
     ports:

@@ -1,2 +1,3 @@
 app/dataset/*
+etl/SE3_OUTPUT_RESULTS/
 data/*.json

@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<yandex>
+    <!-- ================================================================ -->
+    <!-- CONFIGURATION CLICKHOUSE — ACCÈS HDFS                          -->
+    <!-- ================================================================ -->
+
+    <!-- ================================================================ -->
+    <!-- 1. CONFIGURATION HADOOP / HDFS POUR CLICKHOUSE                 -->
+    <!-- ================================================================ -->
+    <hdfs>
+        <!-- Chemin vers les fichiers de configuration Hadoop -->
+        <hadoop_kerberos_keytab>/etc/hadoop/conf/hdfs-site.xml</hadoop_kerberos_keytab>
+
+        <!-- Configuration HDFS de base -->
+        <hdfs_path_prefix>hdfs://namenode:9000</hdfs_path_prefix>
+    </hdfs>
+
+    <!-- ================================================================ -->
+    <!-- 2. PARAMÈTRES DE CONNEXION HDFS NATIFS                         -->
+    <!-- ================================================================ -->
+    <hdfs_config>
+        <!-- NameNode HDFS -->
+        <namenode_host>namenode</namenode_host>
+        <namenode_port>9000</namenode_port>
+
+        <!-- Utilisateur HDFS -->
+        <hdfs_user>hdfs</hdfs_user>
+
+        <!-- WebHDFS (optionnel, pour accès HTTP) -->
+        <webhdfs_enabled>true</webhdfs_enabled>
+        <webhdfs_host>namenode</webhdfs_host>
+        <webhdfs_port>9870</webhdfs_port>
+    </hdfs_config>
+
+    <!-- ================================================================ -->
+    <!-- 3. MOTEUR TABLE HDFS — CONFIGURATION NATIF                     -->
+    <!-- ================================================================ -->
+    <!--
+        ClickHouse supporte le moteur HDFS natif qui permet de :
+        • Lire des fichiers directement depuis HDFS
+        • Supporter plusieurs formats: Parquet, ORC, CSV, TSV, JSON
+        • Paralléliser la lecture sur plusieurs blocs
+
+        Exemple de requête:
+        CREATE TABLE axe1_parquet
+        ENGINE = HDFS('hdfs://namenode:9000/data/processed/axe1_reputation/*', 'Parquet')
+
+        SELECT COUNT(*) FROM axe1_parquet;
+    -->
+
+    <!-- ================================================================ -->
+    <!-- 4. PARAMÈTRES DE PERFORMANCE HDFS                              -->
+    <!-- ================================================================ -->
+    <hdfs_performance>
+        <!-- Nombre de threads pour lire HDFS en parallèle -->
+        <hdfs_read_threads>4</hdfs_read_threads>
+
+        <!-- Taille du buffer pour la lecture -->
+        <hdfs_read_buffer_size>8388608</hdfs_read_buffer_size>
+
+        <!-- Timeout de connexion HDFS (en secondes) -->
+        <hdfs_connection_timeout>30</hdfs_connection_timeout>
+    </hdfs_performance>
+
+    <!-- ================================================================ -->
+    <!-- 5. LOGGING HDFS                                                -->
+    <!-- ================================================================ -->
+    <hdfs_logging>
+        <level>information</level>
+        <hdfs_client_debug>false</hdfs_client_debug>
+    </hdfs_logging>
+
+</yandex>
