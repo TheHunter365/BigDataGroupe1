@@ -1,136 +1,124 @@
-# 🍽️ Yelp Data Pipeline — Simulation d'Ingestion
+# 🚀 Pipeline d'Ingestion Kafka — Équipe SE2
 
-Pipeline de données simulant l'ingestion en temps réel du dataset académique Yelp.
-Le script `producer_mock.py` joue le rôle d'un **producteur Kafka offline** : il lit les données business en batch, puis streame les avis (reviews) avec un délai artificiel pour imiter un flux live.
-
----
-
-## 📁 Structure du projet
-
-```
-.
-├── ingestion/
-│   ├── producer_mock.py                  # Script principal d'ingestion
-│   └── README.md
-└── data/sample/
-    ├── mock_review.json                  # Échantillon de 100 avis (JSONL)
-    └── yelp_academic_dataset_business.json # Dataset complet des entreprises (~118 MB, JSONL)
-```
+> **Projet Big Data** | Apache Kafka Producer | Dataset Yelp Academic  
+> *Meryem & Ibtisam*
 
 ---
 
-## 🗂️ Description des fichiers de données
+## 📋 Présentation
 
-### `yelp_academic_dataset_business.json`
-Fichier JSONL (une entrée JSON par ligne) contenant les entreprises référencées sur Yelp.
-
-| Champ        | Type    | Description                        |
-|--------------|---------|------------------------------------|
-| `business_id`| string  | Identifiant unique de l'entreprise |
-| `name`       | string  | Nom de l'établissement             |
-| `city`       | string  | Ville                              |
-| `stars`      | float   | Note moyenne (1.0 à 5.0)           |
-| `review_count`| int    | Nombre total d'avis                |
-| `categories` | string  | Catégories séparées par des virgules |
-
-### `mock_review.json`
-Échantillon de **100 avis** au format JSONL, extrait du dataset Yelp Reviews pour les tests.
-
-| Champ       | Type   | Description                        |
-|-------------|--------|------------------------------------|
-| `review_id` | string | Identifiant unique de l'avis       |
-| `user_id`   | string | Identifiant de l'auteur            |
-| `business_id`| string| Entreprise concernée               |
-| `stars`     | float  | Note donnée (1.0 à 5.0)            |
-| `text`      | string | Contenu textuel de l'avis          |
-| `date`      | string | Horodatage (`YYYY-MM-DD HH:MM:SS`) |
-| `useful`    | int    | Votes "utile"                      |
-| `funny`     | int    | Votes "drôle"                      |
-| `cool`      | int    | Votes "cool"                       |
+Ce dépôt contient le **Producer Kafka** développé par l'équipe SE2 dans le cadre du projet Big Data. L'objectif est d'ingérer les 5 fichiers JSON du dataset Yelp Academic vers un cluster Apache Kafka local, en garantissant vitesse, fiabilité et intégrité des données pour les équipes consommatrices en aval (SE3 & SE4).
 
 ---
 
-## ⚙️ Fonctionnement du script
-
-Le script `producer_mock.py` s'exécute en deux phases séquentielles :
+## 🏗️ Architecture
 
 ```
-PHASE 1 — Batch Business
-  └── Lecture ligne par ligne de yelp_academic_dataset_business.json
-  └── Affichage des 5 premières entrées + comptage total
-
-PHASE 2 — Streaming Reviews (Simulation)
-  └── Lecture ligne par ligne de mock_review.json
-  └── Pause de 0.5s entre chaque avis pour simuler un flux temps réel
+Fichiers JSON (5x)
+      │
+      ▼
+ Producer Python
+ (kafka-producer.py)
+      │
+      ▼
+ Broker Kafka (kafka:29092)
+      │
+      ├──▶ topic_business
+      ├──▶ topic_reviews
+      ├──▶ topic_users
+      ├──▶ topic_tips
+      └──▶ topic_checkins
 ```
-
-> 💡 **Pourquoi ligne par ligne ?**
-> Les fichiers JSONL sont volumineux. Charger tout le fichier en RAM d'un coup (`json.load()`) provoquerait un crash sur les petites machines. La lecture ligne par ligne (`for line in f`) maintient une empreinte mémoire constante, quel que soit la taille du fichier.
 
 ---
 
-## 🚀 Utilisation
+## 📁 Fichiers Sources & Topics Kafka
 
-### Prérequis
+| Fichier JSON | Topic Kafka | Messages ingérés | Taille brute (JSON) | Taille Kafka (LZ4) |
+|---|---|---|---|---|
+| `yelp_academic_dataset_user.json` | `topic_users` | 1 626 396 | ~3.3 GB | 2 GB |
+| `yelp_academic_dataset_review.json` | `topic_reviews` | 258 329 | ~4.5 GB | 123 MB |
+| `yelp_academic_dataset_tip.json` | `topic_tips` | 908 915 | ~490 MB | 110 MB |
+| `yelp_academic_dataset_checkin.json` | `topic_checkins` | 131 929 | ~270 MB | 145 MB |
+| `yelp_academic_dataset_business.json` | `topic_business` | 150 346 | ~115 MB | 43 MB |
+| **Total** | **5 topics** | **3 075 915** | **~8.65 GB** | **~2.4 GB** |
 
-- Python 3.7+
-- Aucune dépendance externe (uniquement la bibliothèque standard)
+> 💡 **Note** : La taille brute (~8.65 GB) correspond au dataset JSON officiel Yelp non compressé ([source officielle](https://business.yelp.com/data/resources/open-dataset/)). La taille Kafka (~2.4 GB) reflète le stockage après compression **LZ4** appliquée par le Producer.
 
-### Installation
+---
+
+## ⚙️ Prérequis
+
+- Python 3.8+
+- Un cluster Apache Kafka accessible sur `kafka:29092`
+- Les 5 fichiers JSON du dataset Yelp placés dans le même répertoire que le script
+
+**Installation des dépendances :**
 
 ```bash
-git clone <url-du-repo>
-cd <nom-du-repo>
+pip install kafka-python
 ```
 
-### Lancement
+---
 
-Les fichiers de données sont attendus dans `data/sample/`. Depuis la racine du dépôt :
+## ▶️ Utilisation
+
+1. Clonez ce dépôt et placez les fichiers JSON dans le dossier racine.
+2. Assurez-vous que votre broker Kafka est lancé et accessible.
+3. Exécutez le script :
 
 ```bash
-python ingestion/producer_mock.py
+python kafka-producer.py
 ```
 
-### Exemple de sortie
-
-```
-🚀 DÉMARRAGE DE L'INGESTION DES DONNÉES (OFFLINE MOCK)
-==================================================
-
-🏢 PHASE 1 : Lecture du fichier Business...
-   ✅ [Business 1] Rancho Caliente | Ville: Las Vegas | ⭐ 4.0
-   ✅ [Business 2] Body Cycle Studio | Ville: Pittsburgh | ⭐ 4.5
-   ...
-✔️ SUCCÈS : 150346 entreprises lues avec succès !
-
-💬 PHASE 2 : Streaming des Reviews (Simulation Live)...
-   🔄 [NOUVEL AVIS] 📅 2018-07-07 22:09:11 | ⭐ 3.0 étoiles | 🆔 KU_O5udG6zpxOg-VcAEodg
-   🔄 [NOUVEL AVIS] 📅 2012-01-03 15:28:18 | ⭐ 5.0 étoiles | 🆔 BiTunyQ73aT9WBnpR9DZGw
-   ...
-✔️ SUCCÈS : Fin du flux de données MOCK.
-
-==================================================
-🏁 PIPELINE D'INGESTION (TEST LOCAL) TERMINÉ.
-```
+Le script traitera les fichiers **séquentiellement** et affichera la progression tous les 100 000 messages envoyés.
 
 ---
 
-## 🔭 Évolutions prévues
+## 🔧 Choix Techniques
 
-Ce script est une **simulation locale** destinée à valider la logique d'ingestion avant intégration avec Apache Kafka.
+### Traitement séquentiel
+Les 5 fichiers sont traités **l'un après l'autre** (et non en parallèle) afin d'éviter toute saturation de la RAM et tout goulot d'étranglement I/O disque. Cette approche garantit la stabilité du système.
 
-| Étape | Description |
-|-------|-------------|
-| ✅ Mock local | Lecture fichiers + simulation délai |
-| 🔲 Producteur Kafka | Envoi des messages dans des topics Kafka |
-| 🔲 Consommateur | Lecture et traitement des messages depuis Kafka |
-| 🔲 Stockage | Persistance dans une base de données (ex. PostgreSQL, MongoDB) |
-| 🔲 Dashboard | Visualisation temps réel des avis |
+### Micro-Batching & Compression LZ4
+Le Producer est configuré en mode **Haute Performance** :
+
+```python
+producer = KafkaProducer(
+    bootstrap_servers=['kafka:29092'],
+    batch_size=65536,       # Paquets de 64 KB
+    linger_ms=10,           # Attente max avant envoi
+    compression_type='lz4'  # Compression réseau
+)
+```
+
+Ces paramètres regroupent les messages en lots compressés, réduisant la bande passante et maximisant le débit.
 
 ---
 
-## 📄 Source des données
+## 🛡️ Tolérance aux Pannes
 
-Dataset issu du **Yelp Open Dataset** — [https://www.yelp.com/dataset](https://www.yelp.com/dataset)
+Des `JSONDecodeError` ont été détectées lors des premiers tests, causées par des caractères de contrôle invisibles dans `review.json`. La solution adoptée :
 
-> Utilisation réservée à des fins académiques et de recherche, conformément aux conditions d'utilisation de Yelp.
+```python
+data = json.loads(line, strict=False)  # Tolérance aux caractères de contrôle
+```
+
+Les lignes non parsables sont **ignorées et comptabilisées** sans interrompre le pipeline. Au total, **2 lignes corrompues** ont été détectées (1 dans `review.json`, 1 dans `user.json`), pour un taux d'intégrité des données de **99.9999 %**.
+
+---
+
+## ✅ Résultats
+
+L'ingestion s'est terminée avec un **succès total** : les 5 topics Kafka ont été alimentés avec intégrité, confirmé via l'interface *UI for Apache Kafka*.
+
+---
+
+## 👥 Équipe
+
+| Membre | Rôle |
+|---|---|
+| Meryem | Développement Producer & Tests · Architecture & Documentation |
+| Ibtisam | Développement Producer & Tests · Architecture & Documentation |
+
+*Équipe SE2 — Projet Big Data*

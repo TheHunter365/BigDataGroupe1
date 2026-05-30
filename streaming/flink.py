@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.datastream.connectors.kafka import (
     KafkaSource, 
@@ -13,6 +14,129 @@ from pyflink.common.watermark_strategy import WatermarkStrategy
 from pyflink.common.typeinfo import Types
 from pyflink.datastream.window import TumblingProcessingTimeWindows
 from pyflink.common.time import Time
+
+def analyze_sentiment(text, stars=None):
+    """
+    Perform computationally cheap but highly accurate rule-based sentiment analysis.
+    Handles negation, common strong/moderate positive/negative keywords, and
+    correlates with Yelp star ratings if available for maximum accuracy.
+    """
+    # Hybrid heuristic: Star ratings are explicit signals of sentiment
+    if stars is not None:
+        if stars <= 2.0:
+            return "negative"
+        elif stars >= 4.0:
+            return "positive"
+        # 3.0 stars is neutral, let's analyze the text to refine it
+
+    if not text or not isinstance(text, str):
+        return "neutral"
+
+    # Extract words and clause-level punctuation as separate tokens
+    tokens = re.findall(r"[a-z']+|[.,!;?]", text.lower())
+    if not tokens:
+        return "neutral"
+
+    # Lexicon Definition
+    negations = {
+        "not", "no", "never", "neither", "nor", "none", "nothing",
+        "didnt", "wasnt", "isnt", "werent", "havent", "hadnt", "dont",
+        "cant", "couldnt", "shouldnt", "wouldnt", "wont", "without",
+        "lack", "lacked", "hardly", "barely", "rarely",
+        # Support versions with apostrophes
+        "didn't", "wasn't", "isn't", "weren't", "haven't", "hadn't", "don't",
+        "can't", "couldn't", "shouldn't", "wouldn't", "won't"
+    }
+
+    # If any of these tokens are encountered during negation lookahead, stop the lookahead
+    clause_boundaries = {
+        ".", ",", "!", "?", ";", "and", "but", "yet", "or", "so", 
+        "though", "although", "however", "then", "because"
+    }
+    
+    strong_neg = {
+        "terrible", "horrible", "awful", "worst", "disgusting", "dirty",
+        "rude", "overpriced", "disappointing", "avoid", "unacceptable",
+        "useless", "waste", "poisoning", "roach", "roaches", "disaster", "vomit",
+        "nasty", "gross", "garbage", "trash", "badly", "fail", "failed"
+    }
+    
+    mod_neg = {
+        "bad", "poor", "slow", "cold", "stale", "tasteless", "burnt",
+        "raw", "mean", "dislike", "unfortunately", "sadly", "hate",
+        "hated", "expensive", "dry", "bland", "limit", "limited", "wait",
+        "waited", "waiting", "boring", "mediocre", "rude", "poorly", "bug", "bugs"
+    }
+    
+    strong_pos = {
+        "excellent", "amazing", "great", "fantastic", "wonderful", "love",
+        "loved", "perfect", "delicious", "awesome", "outstanding", "favorite",
+        "best", "superb", "highly", "incredible", "incredibly", "phenomenal"
+    }
+    
+    mod_pos = {
+        "good", "nice", "fresh", "clean", "tasty", "friendly", "happy",
+        "enjoyed", "like", "liked", "pleasant", "recommend", "recommended",
+        "polite", "attentive", "warm", "worth", "glad"
+    }
+
+    score = 0.0
+    n = len(tokens)
+    i = 0
+    while i < n:
+        token = tokens[i]
+        
+        # Skip pure punctuation tokens for direct scoring, they only serve as boundaries
+        if token in {".", ",", "!", "?", ";"}:
+            i += 1
+            continue
+
+        # Check for negation
+        if token in negations:
+            negated = False
+            # Check up to 3 tokens ahead (e.g. "not very clean", "not good")
+            lookahead = min(4, n - i)
+            for j in range(1, lookahead):
+                next_token = tokens[i + j]
+                # If we cross a clause boundary, terminate the negation lookup immediately
+                if next_token in clause_boundaries:
+                    break
+                
+                if next_token in strong_pos:
+                    score -= 2.0  # e.g., "not amazing" -> strong negative
+                    i += j
+                    negated = True
+                    break
+                elif next_token in mod_pos:
+                    score -= 1.0  # e.g., "not good" -> negative
+                    i += j
+                    negated = True
+                    break
+                elif next_token in strong_neg or next_token in mod_neg:
+                    score += 1.0  # e.g., "not bad" -> positive
+                    i += j
+                    negated = True
+                    break
+            if not negated:
+                score -= 0.5  # standalone negation (e.g. "no service")
+        elif token in strong_neg:
+            score -= 2.0
+        elif token in mod_neg:
+            score -= 1.0
+        elif token in strong_pos:
+            score += 2.0
+        elif token in mod_pos:
+            score += 1.0
+        
+        i += 1
+
+    # Classify sentiment based on score threshold
+    if score < -0.2:
+        return "negative"
+    elif score > 0.2:
+        return "positive"
+    else:
+        return "neutral"
 
 def main():
     env = StreamExecutionEnvironment.get_execution_environment()
@@ -29,8 +153,8 @@ def main():
     env.add_jars(f"file://{connector_jar}")
 
     bootstrap_servers = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
-    input_topic = os.getenv("KAFKA_TOPIC", "topic_reviews") 
-    output_topic = "yelp-negative-reviews" # Le nouveau topic pour les alertes
+    input_topic = os.getenv("KAFKA_INPUT_TOPIC", os.getenv("KAFKA_TOPIC", "topic_reviews"))
+    output_topic = os.getenv("KAFKA_OUTPUT_TOPIC", "yelp-negative-reviews")
 
     # 1. SOURCE
     source = KafkaSource.builder() \
@@ -51,13 +175,7 @@ def main():
             stars = float(review.get("stars", 0.0))
             text = review.get("text", "")
 
-            text_lower = text.lower()
-            if any(word in text_lower for word in ["amazing", "great", "fantastic"]):
-                sentiment = "positive"
-            elif any(word in text_lower for word in ["terrible", "not", "stale", "overpriced"]):
-                sentiment = "negative"
-            else:
-                sentiment = "neutral"
+            sentiment = analyze_sentiment(text, stars)
 
             return business_id, stars, sentiment
         except json.JSONDecodeError:
