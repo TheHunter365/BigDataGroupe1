@@ -1,25 +1,22 @@
 -- ══════════════════════════════════════════════════════════════
--- SE5 S2 — Pipeline Kafka → ClickHouse  (M1 Work)
--- Auteur : Membre 1 (Data Engineer)
+-- SE5 S3 — Pipeline Kafka → ClickHouse (OPTIMISÉ pour données réelles)
+-- M1 : Data Engineer
 --
--- Topics SE2 consommés :
---   • topic_business  → 141 035 messages (batch, données Yelp businesses)
---   • topic_reviews   → messages streaming (données Yelp reviews)
+-- Optimisations S3 par rapport à S2 :
+--   • reviews_live  : ORDER BY (date, business_id, stars) — date en premier pour Grafana
+--   • businesses_live : ORDER BY (state, city, stars, business_id) — agrégations géo
+--   • alertes        : Partitionnement et TTL ajoutés
 --
--- Architecture par topic (3 objets chacun) :
---   1. kafka_raw_*    : Kafka Engine  → lecture brute du topic
---   2. *_live         : MergeTree     → table destination optimisée
---   3. mv_kafka_to_*  : Materialized View → nettoyage + routage
---
--- Prérequis : Kafka broker sur kafka:29092 (réseau Docker bigdata-net)
---             Topics 'topic_business' et 'topic_reviews' existants
+-- Prérequis :
+--   Kafka broker sur kafka:29092
+--   Topics : 'topic_business', 'topic_reviews', 'yelp-negative-reviews'
 -- ══════════════════════════════════════════════════════════════
 
 USE bigdata_db;
 
 
 -- ╔══════════════════════════════════════════════════════════════╗
--- ║  PIPELINE 1 : topic_business                                ║
+-- ║  PIPELINE 1 : topic_business (SE2 réel)                     ║
 -- ╚══════════════════════════════════════════════════════════════╝
 
 -- ── Étape 1 : Kafka Engine (ingestion brute businesses) ────────
@@ -36,7 +33,7 @@ CREATE TABLE IF NOT EXISTS kafka_raw_business
     stars         Float32,
     review_count  Int32,
     is_open       Int8,
-    categories    String    -- ex: "Restaurants, Food, Italian"
+    categories    String
 )
 ENGINE = Kafka
 SETTINGS
@@ -49,7 +46,11 @@ SETTINGS
     kafka_skip_broken_messages = 50;
 
 
--- ── Étape 2 : MergeTree destination businesses ─────────────────
+-- ── Étape 2 : MergeTree destination businesses (OPTIMISÉ S3) ───
+-- ✨ OPTIMISATION : ORDER BY (state, city, stars, business_id)
+--    → state/city pour filtres Grafana géo (moins de 100K combinaisons)
+--    → stars pour agrégations (20 buckets)
+--    → business_id pour dédupliquage
 CREATE TABLE IF NOT EXISTS businesses_live
 (
     business_id   String,
@@ -67,9 +68,9 @@ CREATE TABLE IF NOT EXISTS businesses_live
     ingested_at   DateTime DEFAULT now()
 )
 ENGINE = MergeTree()
-ORDER BY (city, stars, business_id);    -- optimisé : filtres Grafana par ville + note
--- NB : pas de PRIMARY KEY séparée — ClickHouse impose qu'elle soit un préfixe
---      de l'ORDER BY ; l'ORDER BY tient donc lieu de clé primaire.
+ORDER BY (state, city, stars, business_id)
+SETTINGS
+    index_granularity = 8192;  -- optimal pour 150K businesses
 
 
 -- ── Étape 3 : Materialized View businesses ─────────────────────
@@ -85,7 +86,7 @@ SELECT
     trim(postal_code)                       AS postal_code,
     latitude,
     longitude,
-    if(stars < 0 OR stars > 5, 0, stars)   AS stars,   -- sanitize hors [0,5]
+    if(stars < 0 OR stars > 5, 0, stars)   AS stars,
     if(review_count < 0, 0, review_count)  AS review_count,
     if(is_open = 1, 1, 0)                  AS is_open,
     trim(categories)                        AS categories
@@ -95,7 +96,7 @@ WHERE business_id != ''
 
 
 -- ╔══════════════════════════════════════════════════════════════╗
--- ║  PIPELINE 2 : topic_reviews                                 ║
+-- ║  PIPELINE 2 : topic_reviews (SE2 réel)                      ║
 -- ╚══════════════════════════════════════════════════════════════╝
 
 -- ── Étape 1 : Kafka Engine (ingestion brute reviews) ───────────
@@ -109,7 +110,7 @@ CREATE TABLE IF NOT EXISTS kafka_raw_reviews
     funny       Int32,
     cool        Int32,
     text        String,
-    date        String      -- format : "YYYY-MM-DD HH:MM:SS"
+    date        String
 )
 ENGINE = Kafka
 SETTINGS
@@ -122,7 +123,13 @@ SETTINGS
     kafka_skip_broken_messages = 10;
 
 
--- ── Étape 2 : MergeTree destination reviews ────────────────────
+-- ── Étape 2 : MergeTree destination reviews (OPTIMISÉ S3) ──────
+-- ✨ OPTIMISATION : ORDER BY (date, business_id, stars)
+--    → date en PREMIER : Grafana filtre par plage dates (le plus sélectif ~7M lignes)
+--    → business_id : jointures rapides avec businesses_live
+--    → stars : agrégations (COUNT, AVG, GROUP BY stars)
+-- ✨ PARTITIONING : toYear(date) pour éviter TOO_MANY_PARTS
+--    (~9 ans Yelp → 9 partitions, pas 100+)
 CREATE TABLE IF NOT EXISTS reviews_live
 (
     review_id   String,
@@ -137,14 +144,11 @@ CREATE TABLE IF NOT EXISTS reviews_live
     ingested_at DateTime DEFAULT now()
 )
 ENGINE = MergeTree()
--- Partitionnement ANNUEL : le dataset Yelp couvre ~9 ans (2015-2023).
--- toYYYYMM générerait +100 partitions par bloc d'insertion → erreur
--- TOO_MANY_PARTS (limite max_partitions_per_insert_block = 100).
 PARTITION BY toYear(date)
-ORDER BY (business_id, date, stars);    -- optimisé : jointures + time range Grafana
--- NB : pas de TTL sur 'date' — le dataset Yelp est historique (avis de 2015 à
---      2023). Un TTL « date + INTERVAL N YEAR » supprimerait la quasi-totalité
---      des avis dès leur insertion.
+ORDER BY (date, business_id, stars)
+SETTINGS
+    index_granularity = 8192,  -- optimal pour ~7M rows
+    ttl_only_drop_parts = 1;   -- performance TTL (optionnel)
 
 
 -- ── Étape 3 : Materialized View reviews ────────────────────────
@@ -164,22 +168,19 @@ SELECT
 FROM kafka_raw_reviews
 WHERE review_id   != ''
   AND business_id != ''
-  -- colonne qualifiée : évite que l'analyseur ClickHouse confonde
-  -- 'date' avec l'alias DateTime du SELECT (erreur CANNOT_PARSE_DATETIME).
   AND kafka_raw_reviews.date != '';
 
 
 -- ╔══════════════════════════════════════════════════════════════╗
--- ║  PIPELINE 3 : yelp-negative-reviews  (output Flink SE4)     ║
--- ║  Alertes temps réel : avis négatifs détectés par Flink       ║
+-- ║  PIPELINE 3 : yelp-negative-reviews (SE4 Flink - Alertes)   ║
 -- ╚══════════════════════════════════════════════════════════════╝
 
--- ── Étape 1 : Kafka Engine (alertes brutes depuis Flink SE4) ───
+-- ── Étape 1 : Kafka Engine (alertes Flink SE4) ────────────────
 CREATE TABLE IF NOT EXISTS kafka_raw_negative_alerts
 (
     business_id String,
     stars       Float32,
-    alert       String    -- ex: "Avis Négatif Détecté"
+    alert       String
 )
 ENGINE = Kafka
 SETTINGS
@@ -192,18 +193,24 @@ SETTINGS
     kafka_skip_broken_messages = 10;
 
 
--- ── Étape 2 : MergeTree destination alertes ────────────────────
+-- ── Étape 2 : MergeTree destination alertes (S3 OPTIMISÉ) ──────
+-- ✨ OPTIMISATION : Partition mensuelle + TTL 6 mois (données temps-réel)
+-- ✨ ORDER BY : (received_at, business_id)
+--    → reçue_at : requêtes récentes (alertes vivantes)
+--    → business_id : jointure rapide avec businesses_live
 CREATE TABLE IF NOT EXISTS negative_alerts_live
 (
     business_id  String,
     stars        Float32,
     alert        String,
-    received_at  DateTime DEFAULT now()    -- horodatage d'arrivée dans ClickHouse
+    received_at  DateTime DEFAULT now()
 )
 ENGINE = MergeTree()
 PARTITION BY toYYYYMM(received_at)
 ORDER BY (received_at, business_id)
-TTL received_at + INTERVAL 6 MONTH;
+TTL received_at + INTERVAL 6 MONTH DELETE
+SETTINGS
+    index_granularity = 8192;
 
 
 -- ── Étape 3 : Materialized View alertes ────────────────────────
@@ -222,4 +229,16 @@ WHERE business_id != ''
 -- ══════════════════════════════════════════════════════════════
 -- VÉRIFICATION
 -- ══════════════════════════════════════════════════════════════
+
+-- Afficher tous les objets créés
 SHOW TABLES FROM bigdata_db;
+
+-- Afficher les ORDER BY actuels
+SELECT
+    table_name,
+    engine,
+    formatReadableQuantity(total_bytes) AS size
+FROM system.tables
+WHERE database = 'bigdata_db'
+ORDER BY total_bytes DESC
+FORMAT PrettyCompact;

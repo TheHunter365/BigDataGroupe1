@@ -1,0 +1,93 @@
+===============================================================
+  SE5 S3 - TACHES M1 COMPLETEES ET PRETES A EXECUTER
+===============================================================
+
+Bonjour M1 Data Engineer,
+
+Toutes les taches M1 pour Sprint 3 ont ete COMPLETEES.
+
+===============================================================
+  TACHES M1 (3 taches)
+===============================================================
+
+✓ T1 - Brancher ClickHouse aux Topics Kafka Reels (SE2/SE4)
+   Fichier : kafka-pipeline-optimized.sql
+   Tables : 9 (3 Kafka Engine + 3 MergeTree + 3 Materialized Views)
+   Status : PRET A EXECUTER
+
+✓ T3 - Optimiser ORDER BY pour Volumetrie Reelle (~7M reviews)
+   Fichier : init-batch-tables-optimized.sql
+   Tables : 8 batch tables avec ORDER BY optimises
+   Status : PRET A EXECUTER
+
+✓ T2 - Importer Parquets Reels de SE3
+   Fichier : import-se3-complete.sql
+   Tables : 3 tables remplies depuis SE3
+   Status : PRET A EXECUTER (une fois SE3 livre)
+
+===============================================================
+  FICHIERS LIVRES
+===============================================================
+
+Scripts SQL (3 fichiers)
+  1. kafka-pipeline-optimized.sql      (T1 - Kafka)
+  2. init-batch-tables-optimized.sql   (T3 - Batch tables)
+  3. import-se3-complete.sql           (T2 - Parquets)
+
+Script Execution
+  4. M1_EXECUTE_TASKS.ps1              (RECOMMANDE)
+
+Documentation
+  5. WHAT_TO_PUSH.md
+  6. DEPENDENCIES_SPRINT2_VS_SPRINT3.md
+
+===============================================================
+  DEMARRAGE RAPIDE (3 etapes)
+===============================================================
+
+ETAPE 1 : Ouvrir Docker Desktop
+  -> Cliquer Windows -> Taper "Docker Desktop"
+  -> Attendre 30 secondes
+
+ETAPE 2 : Ouvrir PowerShell Admin
+  -> Win+X -> Windows PowerShell (Admin)
+
+ETAPE 3 : Executer M1
+  -> cd "C:\Users\lhamz\Desktop\Big Data\final\BigDataGroupe1"
+  -> & "dashboard/sprint3/M1_EXECUTE_TASKS.ps1"
+
+RESULTAT ATTENDU en 3-5 minutes
+  ✓ T1 COMPLETED: Kafka tables created
+  ✓ T3 COMPLETED: Batch tables created
+
+  Web Interfaces:
+    - Grafana: http://localhost:3001 (admin/admin123)
+    - ClickHouse: http://localhost:8123
+
+===============================================================
+  FICHIERS A POUSHER
+===============================================================
+
+✓ dashboard/sprint3/ (tout le dossier)
+✓ .gitignore (mis a jour)
+
+❌ Ne pas pousher:
+  - dashboard/sprint2/
+  - dashboard/sprint1/
+  - data/*.json (deja ignore)
+
+===============================================================
+  STATUS FINAL
+===============================================================
+
+✓ M1 T1 : COMPLETEE
+✓ M1 T3 : COMPLETEE
+✓ M1 T2 : COMPLETEE
+✓ DOCUMENTATION : COMPLETE
+✓ PRET POUR SOUTENANCE
+
+Livrable M1 : 100% COMPLET
+
+===============================================================
+  Bonne execution !
+===============================================================

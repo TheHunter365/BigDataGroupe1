@@ -1,3 +1,27 @@
 app/dataset/*
 etl/SE3_OUTPUT_RESULTS/
 data/*.json
+
+# Fichiers temporaires et logs (à ne pas committer)
+*.log
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.env.local
+.vscode/
+.idea/
+
+# Résultats exécution scripts
+M1_EXECUTION_LOG.txt
+M1_EXECUTION_*.log
+
+# Cache et données temporaires
+dashboard/sprint3/temp/
+dashboard/sprint3/.cache/
+docker-compose.override.yml

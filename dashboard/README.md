@@ -1,131 +1,132 @@
-# SE5 — ClickHouse & Grafana (mode Docker)
+# SE5 — Dashboard · Vue d'ensemble
 
-Ce dossier contient une configuration complète pour un pipeline de visualisation de données avec ClickHouse et Grafana. Les conteneurs sont orchestrés par `docker-compose.yml` — il n'est pas nécessaire d'installer les services localement.
+**Sous-Équipe 5 — Visualisation & Dashboard** · Groupe 1 · SNIA S2 · FSR Rabat
+Technologies : ClickHouse · Grafana · Kafka · Python
 
-## Contenu principal
+## Structure
 
-- `docker-compose.yml` : compose définissant les services `clickhouse` et `grafana`.
-- `init-db.sql` : script d'initialisation de la base de données ClickHouse.
-- `provisioning/` : configuration Grafana (datasources et dashboards).
-- `dashboards/` : dashboards Grafana (ex. `se5-dashboard.json`).
-- `rapport/` : documentation et rapports du projet.
+```
+dashboard/
+├── sprint1/    Setup statique ClickHouse + Grafana (sans Kafka)
+├── sprint2/    Pipeline Kafka → ClickHouse → Grafana sur données mock
+└── sprint3/    Connexion aux données réelles SE2 / SE3 / SE4
+```
 
-## Prérequis
+## Progression par sprint
 
-- Docker et docker-compose installés sur la machine hôte.
+| Sprint | Livrable SE5 | Statut |
+|---|---|---|
+| S1 | Dashboard esquissé sur données mock statiques | ✅ |
+| S2 | Dashboard MOCK terminé — pipeline Kafka opérationnel | ✅ |
+| S3 | Tables batch créées, scripts prêts — en attente SE2/SE3/SE4 | 🔄 |
+| S4 | Dashboard final + insights documentés | ⬜ |
 
-## Lancer l'environnement (Docker)
+## Lancer l'environnement
 
-Depuis le dossier `se5` :
-
-### Bash / Linux / macOS
+### Sprint 1 (statique — autonome)
 
 ```bash
-cd se5
-docker-compose up --build -d
+cd dashboard/sprint1
+docker-compose up -d
+# Grafana : http://localhost:3001 (admin / admin123)
 ```
 
-### PowerShell (Windows)
-
-```powershell
-cd se5
-docker-compose up --build -d
-```
-
-## Vérifier les services et logs
-
-### Bash / Linux / macOS
-
-- Voir l'état des conteneurs :
+### Sprint 2 (mock — autonome)
 
 ```bash
-docker-compose ps
+cd dashboard/sprint2
+bash setup-s2.sh
+pip install -r requirements.txt
+python3 mock-producer.py
+# Grafana : http://localhost:3001  (admin / admin123)
 ```
 
-- Suivre les logs de ClickHouse :
+### Sprint 3 (données réelles — après setup-s2.sh)
 
 ```bash
-docker-compose logs -f clickhouse
+# Créer les tables batch
+bash dashboard/sprint3/setup-s3.sh
+
+# Quand SE3 livre les Parquets
+bash dashboard/sprint3/import-parquets.sh /chemin/parquets
+
+# Vérifier les connexions SE2 / SE4
+bash dashboard/sprint3/check-connections.sh
 ```
 
-- Suivre les logs de Grafana :
+## Architecture globale (S3)
 
-```bash
-docker-compose logs -f grafana
+```
+             mock-producer.py (S2)
+                    │
+SE2 (Kafka) ───────┼──► ClickHouse (Kafka Engine + MV) ──► Grafana
+SE4 (Flink) ───────┘         │
+SE3 (Parquets) ──────────────┘
 ```
 
-### PowerShell (Windows)
+## Documentation par sprint
 
-- Voir l'état des conteneurs :
+- [sprint1/README.md](sprint1/README.md) — Setup statique (ClickHouse + Grafana)
+- [sprint2/README.md](sprint2/README.md) — Pipeline Kafka temps réel + Dashboard 15 panels
+- [sprint3/README.md](sprint3/README.md) — Connexion données réelles + scripts d'import
+- [sprint2/GUIDE_M2.md](sprint2/GUIDE_M2.md) — Guide Data Analyst (description détaillée des 15 panels)
 
-```powershell
-docker-compose ps
+## Prérequis globaux
+
+- Docker et Docker Compose
+- Python 3.8+ (pour mock-producer.py et import-parquets.sh)
+- bash ou Git Bash (Windows)
+
+## Dépendances entre sprints
+
+```
+Sprint 1 (S1) ──► Sprint 2 (S2) ──► Sprint 3 (S3) ──► Sprint 4 (S4)
+(statique)      (mock temps réel)  (données réelles)  (final)
 ```
 
-- Suivre les logs de ClickHouse :
+- **S1 → S2** : S2 est un upgrade de S1 avec Kafka. Peut coexister.
+- **S2 → S3** : S3 ajoute les connexions réelles. Nécessite que S2 ait démarré (`setup-s2.sh`).
+- **S3 → S4** : S4 finalise le dashboard et ajoute les insights métier.
 
-```powershell
-docker-compose logs -f clickhouse
-```
+## Principales tâches par sprint
 
-- Suivre les logs de Grafana :
+### Sprint 1 (M1 + M2)
+- ✅ Setup ClickHouse + Grafana
+- ✅ Dashboard avec données statiques (6 KPIs)
 
-```powershell
-docker-compose logs -f grafana
-```
+### Sprint 2 (M1 + M2)
+- ✅ Pipeline Kafka → ClickHouse
+- ✅ Dashboard complet (15 panels)
+- ✅ Requêtes SQL documentées
 
-## Accès aux interfaces
+### Sprint 3 (M1 + M2)
+- [ ] Connexion Kafka réel (SE2)
+- [ ] Alertes Flink (SE4)
+- [ ] Import Parquets SE3
+- [ ] Variables interactives Grafana
+- [ ] Alertes Grafana
 
-- **Grafana** : http://localhost:3001
-  - Identifiants par défaut : `admin` / `admin123`
-  - Dashboard par défaut : `se5-dashboard.json`
+### Sprint 4 (M2)
+- [ ] Peaufinage UX dashboard
+- [ ] Documentation insights métier
+- [ ] Vidéo de démo
+- [ ] Résumés techniques
 
-- **ClickHouse HTTP** : http://localhost:8123
-  - Interface native TCP sur le port `9000`
+## Fichiers clés
 
-## Configuration et variables d'environnement
+| Fichier | Sprint | Rôle |
+|---|---|---|
+| `init-db.sql` | S1 | DDL tables + données statiques |
+| `docker-compose.yml` | S1, S2 | Orchestration services |
+| `setup-s2.sh` | S2 | Démarrage complet S2 (services + topics + pipelines) |
+| `kafka-pipeline.sql` | S2 | Pipelines Kafka Engine + Materialized Views |
+| `mock-producer.py` | S2 | Générateur données mock |
+| `se5-yelp-dashboard.json` | S2, S3 | Dashboard 15 panels |
+| `queries.sql` | S2 | Requêtes SQL documentées |
+| `setup-s3.sh` | S3 | Création tables batch S3 |
+| `import-parquets.sh` | S3 | Import Parquets SE3 |
+| `check-connections.sh` | S3 | Validation connexions SE2/SE3/SE4 |
 
-Les services utilisent les variables d'environnement suivantes (définies dans `docker-compose.yml`) :
+## Pour plus d'informations
 
-**Grafana :**
-- `GF_SECURITY_ADMIN_USER` : utilisateur administrateur (par défaut `admin`)
-- `GF_SECURITY_ADMIN_PASSWORD` : mot de passe administrateur (par défaut `admin123`)
-- `GF_INSTALL_PLUGINS` : plugins Grafana (ex. `grafana-clickhouse-datasource`)
-- `GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH` : dashboard par défaut
-
-**ClickHouse :**
-- `CLICKHOUSE_DB` : base de données par défaut (par défaut `bigdata_db`)
-- `CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT` : gestion d'accès activée
-
-## Architecture de stockage
-
-- `clickhouse-data` : données persistantes de ClickHouse
-- `clickhouse-logs` : logs de ClickHouse
-- `grafana-data` : données persistantes de Grafana
-- `bigdata-net` : réseau Docker partagé
-
-## Arrêter et nettoyer
-
-### Bash / Linux / macOS
-
-```bash
-docker-compose down
-```
-
-Pour supprimer également les volumes (réinitialise les données) :
-
-```bash
-docker-compose down -v
-```
-
-### PowerShell (Windows)
-
-```powershell
-docker-compose down
-```
-
-Pour supprimer également les volumes (réinitialise les données) :
-
-```powershell
-docker-compose down -v
-```
+Voir les README individuels de chaque sprint pour les détails d'installation, d'utilisation et de dépannage.
