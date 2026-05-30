@@ -1,6 +1,6 @@
 # ===========================================================================
-#  DOCKER COMPOSE — LAMBDA ARCHITECTURE BIG DATA (CORRIGÉ)
-#  SE1 (HDFS/YARN) + SE2 (Kafka) + SE3 (Spark sur YARN) + SE4 (Flink) + SE5 (ClickHouse + Grafana)
+#  DOCKER COMPOSE — LAMBDA ARCHITECTURE BIG DATA (NEXT-GEN 1.20 AUTOMATISÉ)
+#  SE1 (HDFS/YARN) + SE2 (Kafka) + SE3 (Spark sur YARN) + SE4 (Flink 1.20) + SE5 (ClickHouse + Grafana)
 # ===========================================================================
 
 networks:
@@ -24,7 +24,7 @@ services:
 #  SE1 — INFRASTRUCTURE BIG DATA (HDFS + YARN)
 # ===========================================================================
   namenode:
-    image: docker.io/bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
     restart: always
     ports:
@@ -38,15 +38,15 @@ services:
       - ./hadoop.env
     healthcheck:
       test: ["CMD", "hdfs", "dfsadmin", "-report"]
-      interval: 15s
+      interval: 20s
       timeout: 10s
-      retries: 10
-      start_period: 30s
+      retries: 5
+      start_period: 40s
     networks:
       - bigdata-network
 
   datanode1:
-    image: docker.io/bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode1
     restart: always
     ports:
@@ -60,17 +60,11 @@ services:
     depends_on:
       namenode:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9864 > /dev/null"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
     networks:
       - bigdata-network
 
   datanode2:
-    image: docker.io/bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode2
     restart: always
     ports:
@@ -84,17 +78,11 @@ services:
     depends_on:
       namenode:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9864 > /dev/null"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
     networks:
       - bigdata-network
 
   resourcemanager:
-    image: docker.io/bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
     container_name: resourcemanager
     restart: always
     ports:
@@ -103,17 +91,20 @@ services:
       SERVICE_PRECONDITION: "namenode:9870"
     env_file:
       - ./hadoop.env
+    depends_on:
+      namenode:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8088/ws/v1/cluster/info > /dev/null"]
-      interval: 15s
+      interval: 20s
       timeout: 10s
-      retries: 10
-      start_period: 30s
+      retries: 5
+      start_period: 40s
     networks:
       - bigdata-network
 
   nodemanager1:
-    image: docker.io/bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
     container_name: nodemanager1
     restart: always
     environment:
@@ -121,23 +112,13 @@ services:
     env_file:
       - ./hadoop.env
     depends_on:
-      namenode:
-        condition: service_healthy
       resourcemanager:
         condition: service_healthy
-      datanode1:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8042/node > /dev/null"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
     networks:
       - bigdata-network
 
   nodemanager2:
-    image: docker.io/bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
     container_name: nodemanager2
     restart: always
     environment:
@@ -145,23 +126,13 @@ services:
     env_file:
       - ./hadoop.env
     depends_on:
-      namenode:
-        condition: service_healthy
       resourcemanager:
         condition: service_healthy
-      datanode2:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8042/node > /dev/null"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
     networks:
       - bigdata-network
 
   historyserver:
-    image: docker.io/bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
     container_name: historyserver
     restart: always
     volumes:
@@ -171,32 +142,22 @@ services:
     env_file:
       - ./hadoop.env
     depends_on:
-      namenode:
-        condition: service_healthy
       resourcemanager:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8188 > /dev/null"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
     networks:
       - bigdata-network
 
   hdfs-init:
-    image: docker.io/bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: hdfs-init
     depends_on:
       namenode:
         condition: service_healthy
-      datanode1:
-        condition: service_started
-      datanode2:
-        condition: service_started
     restart: "no"
     env_file:
       - ./hadoop.env
+    volumes:
+      - ./data:/app/dataset
     entrypoint: ""
     command: >
       /bin/bash -c "
@@ -206,7 +167,8 @@ services:
           sleep 5
         done &&
         echo 'HDFS READY ✔' &&
-
+        
+        echo '📁 1. Création de l’arborescence de dossiers...' &&
         hdfs dfs -fs hdfs://namenode:9000 -mkdir -p /data/raw/business &&
         hdfs dfs -fs hdfs://namenode:9000 -mkdir -p /data/raw/review &&
         hdfs dfs -fs hdfs://namenode:9000 -mkdir -p /data/raw/user &&
@@ -223,20 +185,73 @@ services:
         hdfs dfs -fs hdfs://namenode:9000 -mkdir -p /data/processed/axe4_temporal &&
 
         hdfs dfs -fs hdfs://namenode:9000 -mkdir -p /spark/logs &&
+        echo 'Arborescence HDFS créée avec succès ✔' &&
 
+        echo '🚀 2. Début du stockage du Full Dataset sur HDFS (Batch Layer)...' &&
+        
+        if [ -f /app/dataset/yelp_academic_dataset_business.json ]; then
+          if hdfs dfs -fs hdfs://namenode:9000 -test -e /data/raw/business/yelp_academic_dataset_business.json; then
+            echo '📁 Fichier business déjà présent sur HDFS, skip upload.';
+          else
+            hdfs dfs -fs hdfs://namenode:9000 -put -f /app/dataset/yelp_academic_dataset_business.json /data/raw/business/ &&
+            echo '✅ Fichier business transféré avec succès.';
+          fi
+        else
+          echo '⚠️ Skip: yelp_academic_dataset_business.json introuvable localement.';
+        fi &&
+        
+        if [ -f /app/dataset/yelp_academic_dataset_review.json ]; then
+          if hdfs dfs -fs hdfs://namenode:9000 -test -e /data/raw/review/yelp_academic_dataset_review.json; then
+            echo '📁 Fichier reviews déjà présent sur HDFS, skip upload.';
+          else
+            hdfs dfs -fs hdfs://namenode:9000 -put -f /app/dataset/yelp_academic_dataset_review.json /data/raw/review/ &&
+            echo '✅ Fichier reviews transféré avec succès (Gros morceau !).';
+          fi
+        else
+          echo '⚠️ Skip: yelp_academic_dataset_review.json introuvable localement.';
+        fi &&
+        
+        if [ -f /app/dataset/yelp_academic_dataset_user.json ]; then
+          if hdfs dfs -fs hdfs://namenode:9000 -test -e /data/raw/user/yelp_academic_dataset_user.json; then
+            echo '📁 Fichier users déjà présent sur HDFS, skip upload.';
+          else
+            hdfs dfs -fs hdfs://namenode:9000 -put -f /app/dataset/yelp_academic_dataset_user.json /data/raw/user/ &&
+            echo '✅ Fichier users transféré avec succès.';
+          fi
+        else
+          echo '⚠️ Skip: yelp_academic_dataset_user.json introuvable localement.';
+        fi &&
+        
+        if [ -f /app/dataset/yelp_academic_dataset_tip.json ]; then
+          if hdfs dfs -fs hdfs://namenode:9000 -test -e /data/raw/tip/yelp_academic_dataset_tip.json; then
+            echo '📁 Fichier tips déjà présent sur HDFS, skip upload.';
+          else
+            hdfs dfs -fs hdfs://namenode:9000 -put -f /app/dataset/yelp_academic_dataset_tip.json /data/raw/tip/ &&
+            echo '✅ Fichier tips transféré avec succès.';
+          fi
+        else
+          echo '⚠️ Skip: yelp_academic_dataset_tip.json introuvable localement.';
+        fi &&
+        
+        if [ -f /app/dataset/yelp_academic_dataset_checkin.json ]; then
+          if hdfs dfs -fs hdfs://namenode:9000 -test -e /data/raw/checkin/yelp_academic_dataset_checkin.json; then
+            echo '📁 Fichier checkins déjà présent sur HDFS, skip upload.';
+          else
+            hdfs dfs -fs hdfs://namenode:9000 -put -f /app/dataset/yelp_academic_dataset_checkin.json /data/raw/checkin/ &&
+            echo '✅ Fichier checkins transféré avec succès.';
+          fi
+        else
+          echo '⚠️ Skip: yelp_academic_dataset_checkin.json introuvable localement.';
+        fi &&
+
+        echo '🛡️ 3. Concession des permissions finales...' &&
         hdfs dfs -fs hdfs://namenode:9000 -chmod -R 777 /data &&
         hdfs dfs -fs hdfs://namenode:9000 -chmod -R 777 /spark &&
         hdfs dfs -fs hdfs://namenode:9000 -mkdir -p /tmp/spark-events &&
         hdfs dfs -fs hdfs://namenode:9000 -chmod 777 /tmp/spark-events &&
 
-        echo 'Arborescence HDFS créée avec succès ✔'
+        echo '🔥 INITIALISATION ET CHARGEMENT HDFS TERMINÉS AVEC SUCCÈS ! 🔥'
       "
-    healthcheck:
-      test: ["CMD-SHELL", "hdfs dfs -fs hdfs://namenode:9000 -ls /tmp/spark-events > /dev/null 2>&1"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
     networks:
       - bigdata-network
 
@@ -244,10 +259,13 @@ services:
 #  SE2 — INGESTION / KAFKA
 # ===========================================================================
   kafka:
-    image: docker.io/confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:latest
     container_name: kafka_se2
     ports:
       - "9092:9092"
+    depends_on:
+      hdfs-init:
+        condition: service_completed_successfully
     environment:
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_NODE_ID: 1
@@ -263,16 +281,16 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
     healthcheck:
-      test: ["CMD", "bash", "-c", "kafka-broker-api-versions --bootstrap-server localhost:9092 > /dev/null 2>&1"]
-      interval: 10s
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/29092'"]
+      interval: 15s
       timeout: 5s
       retries: 10
-      start_period: 60s 
+      start_period: 40s
     networks:
       - bigdata-network
 
   kafka-ui:
-    image: docker.io/provectuslabs/kafka-ui:latest
+    image: provectuslabs/kafka-ui:latest
     container_name: kafka_ui_se2
     ports:
       - "8080:8080"
@@ -285,28 +303,37 @@ services:
     networks:
       - bigdata-network
 
+  python-producer:
+    build:
+      context: ./ingestion
+    container_name: se2-python-producer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/dataset
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_TOPIC: topic_reviews
+      PYTHONUNBUFFERED: "1"  
+    networks:
+      - bigdata-network
+
 # ===========================================================================
 #  SE3 — ETL SPARK SUR YARN
-#  Correction : spark-master/worker standalone supprimés — YARN gère les ressources
-#               image bde2020/spark-submit contient le client Hadoop préconfiguré
-#               depends_on python-pipeline (nom corrigé)
 # ===========================================================================
   spark-submit-job:
-    image: docker.io/bde2020/spark-submit:3.3.0-hadoop3.3
+    image: bde2020/spark-base:3.2.0-hadoop3.2
     container_name: se3-spark-submit
     restart: "no"
     depends_on:
-      namenode:
-        condition: service_healthy
       resourcemanager:
         condition: service_healthy
       hdfs-init:
-        condition: service_healthy
+        condition: service_completed_successfully
     volumes:
-      - ./etl/scripts:/app/scripts:z
-      - ./etl/data:/app/data:z
-      - ./etl/output:/app/output:z
-      - ./spark-defaults.conf:/spark/conf/spark-defaults.conf:z
+      - ./etl/scripts:/app/scripts
+      - ./spark-defaults.conf:/spark/conf/spark-defaults.conf
     env_file:
       - ./hadoop.env
     environment:
@@ -316,19 +343,16 @@ services:
       ENABLE_INIT_DAEMON: "false"
     command: >
       /bin/bash -c "
-        echo '⏳ Attente ResourceManager YARN...' &&
         until curl -sf http://resourcemanager:8088/ws/v1/cluster/info > /dev/null 2>&1; do
-          echo 'ResourceManager pas encore prêt, retry 5s...' && sleep 5
+          sleep 5
         done &&
-        echo 'YARN READY ✔' &&
-        echo '🚀 Soumission du job Spark sur YARN...' &&
         /spark/bin/spark-submit /app/scripts/spark_etl.py
       "
     networks:
       - bigdata-network
 
   spark-history:
-    image: docker.io/bde2020/spark-history-server:3.3.0-hadoop3.3
+    image: bde2020/spark-history-server:3.2.0-hadoop3.2
     container_name: se3-spark-history
     restart: always
     ports:
@@ -336,26 +360,22 @@ services:
     depends_on:
       namenode:
         condition: service_healthy
-      hdfs-init:
-        condition: service_healthy
     env_file:
       - ./hadoop.env
     environment:
       SPARK_HISTORY_OPTS: "-Dspark.history.fs.logDirectory=hdfs://namenode:9000/spark/logs"
       SPARK_DAEMON_MEMORY: 1g
     volumes:
-      - ./spark-defaults.conf:/spark/conf/spark-defaults.conf:z
+      - ./spark-defaults.conf:/spark/conf/spark-defaults.conf
       - spark-events:/tmp/spark-events
     networks:
       - bigdata-network
 
 # ===========================================================================
-#  SE4 — STREAM PROCESSING / FLINK
-#  Correction : jobmanager et taskmanager épinglés sur flink:1.20-scala_2.12-java11
-#               JAR Kafka mis à jour dans le Dockerfile (3.3.0-1.20)
+#  SE4 — STREAM PROCESSING / FLINK 1.20 (LATEST 🔥)
 # ===========================================================================
   jobmanager:
-    image: docker.io/library/flink:1.19-scala_2.12-java11
+    image: flink:1.20-scala_2.12-java17
     container_name: se4-jobmanager
     ports:
       - "8083:8081"
@@ -369,17 +389,19 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      hdfs-init:
+        condition: service_completed_successfully 
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8081/overview > /dev/null"]
       interval: 15s
       timeout: 10s
-      retries: 10
+      retries: 5
       start_period: 30s
     networks:
       - bigdata-network
 
   taskmanager:
-    image: docker.io/library/flink:1.19-scala_2.12-java11
+    image: flink:1.20-scala_2.12-java17
     container_name: se4-taskmanager
     command: taskmanager
     environment:
@@ -389,28 +411,9 @@ services:
         taskmanager.numberOfTaskSlots: 2
         taskmanager.memory.process.size: 1024m
     depends_on:
-      jobmanager:
-        condition: service_healthy
+      - jobmanager
     networks:
       - bigdata-network
-
-  python-producer:
-    build:
-      context: ./streaming
-    container_name: se4-python-producer
-    depends_on:
-      kafka:
-        condition: service_healthy
-    volumes:
-      - ./app/dataset:/app/dataset:z
-    command: ["kafka-producer.py"]
-    environment:
-      PYTHONUNBUFFERED: "1"
-      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      KAFKA_TOPIC: yelp-reviews-mock
-    networks:
-      - bigdata-network
-    
 
   python-flink:
     build:
@@ -419,22 +422,21 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-    command: ["flink.py"]
+      jobmanager:
+        condition: service_healthy
     environment:
-      PYTHONUNBUFFERED: "1"
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      KAFKA_TOPIC: yelp-reviews-mock
-      # Correction : JAR compatible Flink 1.19 (défini dans streaming/Dockerfile)
-      FLINK_KAFKA_CONNECTOR_JAR: /opt/flink/lib/flink-sql-connector-kafka-3.3.0-1.19.jar
+      KAFKA_TOPIC: topic_reviews
+      FLINK_KAFKA_CONNECTOR_JAR: /opt/flink/lib/flink-sql-connector-kafka-4.0.1-2.0.jar
+      PYTHONUNBUFFERED: "1"
     networks:
       - bigdata-network
 
 # ===========================================================================
 #  SE5 — VISUALISATION / BI (ClickHouse + Grafana)
-#  Correction : port hôte ClickHouse TCP 9001→9009 (évite confusion avec HDFS:9000)
 # ===========================================================================
   clickhouse:
-    image: docker.io/clickhouse/clickhouse-server:latest
+    image: clickhouse/clickhouse-server:latest
     container_name: clickhouse-server
     ports:
       - "8123:8123"
@@ -442,7 +444,7 @@ services:
     volumes:
       - clickhouse-data:/var/lib/clickhouse
       - clickhouse-logs:/var/log/clickhouse-server
-      - ./dashboard/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:z
+      - ./dashboard/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     environment:
       CLICKHOUSE_DB: bigdata_db
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
@@ -452,14 +454,14 @@ services:
         hard: 262144
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
-      interval: 10s
+      interval: 15s
       timeout: 5s
       retries: 5
     networks:
       - bigdata-network
 
   grafana:
-    image: docker.io/grafana/grafana:latest
+    image: grafana/grafana:latest
     container_name: grafana-se5
     ports:
       - "3001:3000"
@@ -470,9 +472,9 @@ services:
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/se5-dashboard.json
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./dashboard/provisioning/datasources:/etc/grafana/provisioning/datasources:z
-      - ./dashboard/provisioning/dashboards:/etc/grafana/provisioning/dashboards:z
-      - ./dashboard/dashboards:/var/lib/grafana/dashboards:z
+      - ./dashboard/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./dashboard/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./dashboard/dashboards:/var/lib/grafana/dashboards
     depends_on:
       clickhouse:
         condition: service_healthy
