@@ -448,6 +448,8 @@ services:
     environment:
       CLICKHOUSE_DB: bigdata_db
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    env_file:
+      - ./hadoop.env
     ulimits:
       nofile:
         soft: 262144
@@ -457,6 +459,9 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+    depends_on:
+      namenode:
+        condition: service_healthy
     networks:
       - bigdata-network
 
