@@ -174,16 +174,17 @@ def main():
             business_id = str(review.get("business_id", "unknown"))
             stars = float(review.get("stars", 0.0))
             text = review.get("text", "")
+            date = str(review.get("date", ""))
 
             sentiment = analyze_sentiment(text, stars)
 
-            return business_id, stars, sentiment
+            return business_id, stars, sentiment, date
         except json.JSONDecodeError:
-            return "unknown", 0.0, "error"
+            return "unknown", 0.0, "error", ""
 
     processed_stream = stream.map(
         process_review, 
-        output_type=Types.TUPLE([Types.STRING(), Types.FLOAT(), Types.STRING()])
+        output_type=Types.TUPLE([Types.STRING(), Types.FLOAT(), Types.STRING(), Types.STRING()])
     )
 
     # Flux 1 : Les moyennes (On garde le print pour voir dans la console)
@@ -207,7 +208,7 @@ def main():
     # Kafka s'attend à recevoir des chaînes de caractères (Strings), pas des Tuples Python.
     # On transforme donc notre Tuple en un joli JSON textuel.
     negative_json_stream = negative_reviews.map(
-        lambda x: json.dumps({"business_id": x[0], "stars": x[1], "alert": "Avis Négatif Détecté"}),
+        lambda x: json.dumps({"business_id": x[0], "stars": x[1], "date": x[3], "alert": "Avis Négatif Détecté"}),
         output_type=Types.STRING()
     )
 

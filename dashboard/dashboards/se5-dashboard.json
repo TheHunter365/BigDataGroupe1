@@ -183,7 +183,7 @@
       },
       "title": "📈 Avis Reçus par Heure (ingested_at)",
       "type": "timeseries",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT toStartOfHour(ingested_at) AS time, count() AS \"Avis\" FROM bigdata_db.reviews_live WHERE $__timeFilter(ingested_at) GROUP BY time ORDER BY time", "refId": "A" }]
+      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT toStartOfHour(date) AS time, count() AS \"Avis\" FROM bigdata_db.reviews_live WHERE $__timeFilter(date) GROUP BY time ORDER BY time", "refId": "A" }]
     },
 
     {
@@ -203,7 +203,7 @@
       "options": { "showHeader": true, "footer": { "show": false } },
       "title": "🚨 Dernières Alertes Négatives (Flink)",
       "type": "table",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT received_at AS \"Recu le\", business_id AS \"Business\", stars AS \"Note\", alert AS \"Alerte\" FROM bigdata_db.negative_alerts_live ORDER BY received_at DESC LIMIT 50", "refId": "A" }]
+      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT received_at AS \"Recu le\", business_id AS \"Business\", stars AS \"Note\", alert AS \"Alerte\" FROM bigdata_db.negative_alerts_live WHERE $__timeFilter(date) ORDER BY received_at DESC LIMIT 50", "refId": "A" }]
     },
 
     {
@@ -504,7 +504,7 @@
       "options": { "showHeader": true, "footer": { "show": false } },
       "title": "💬 Derniers Avis Reçus (Live)",
       "type": "table",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT date AS \"Date avis\", business_id AS \"Business\", stars AS \"Note\", useful AS \"Utile\", substring(text, 1, 60) AS \"Extrait\" FROM bigdata_db.reviews_live ORDER BY ingested_at DESC LIMIT 20", "refId": "A" }]
+      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT date AS \"Date avis\", business_id AS \"Business\", stars AS \"Note\", useful AS \"Utile\", substring(text, 1, 60) AS \"Extrait\" FROM bigdata_db.reviews_live WHERE $__timeFilter(date) ORDER BY date DESC LIMIT 20", "refId": "A" }]
     },
 
     {
