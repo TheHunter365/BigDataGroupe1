@@ -157,7 +157,7 @@ services:
     env_file:
       - ./hadoop.env
     volumes:
-      - ./app/dataset:/app/dataset:z
+      - ./data/sample:/app/dataset:z
     entrypoint: ""
     command: >
       /bin/bash -c "
@@ -311,7 +311,7 @@ services:
       kafka:
         condition: service_healthy
     volumes:
-      - ./app/dataset:/app/dataset:z
+      - ./data/sample:/app/dataset:z
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       KAFKA_TOPIC: topic_reviews
@@ -356,7 +356,7 @@ services:
     container_name: se3-spark-history
     restart: always
     ports:
-      - "18080:18081"
+      - "18080:18080"
     depends_on:
       namenode:
         condition: service_healthy
@@ -469,6 +469,7 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin123
       GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+      GF_FEATURE_TOGGLES_ENABLE: xychartPanel
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/se5-dashboard.json
     volumes:
       - grafana-data:/var/lib/grafana

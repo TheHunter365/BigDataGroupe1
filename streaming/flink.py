@@ -152,7 +152,7 @@ def main():
     )
     env.add_jars(f"file://{connector_jar}")
 
-    bootstrap_servers = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
+    bootstrap_servers = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
     input_topic = os.getenv("KAFKA_INPUT_TOPIC", os.getenv("KAFKA_TOPIC", "topic_reviews"))
     output_topic = os.getenv("KAFKA_OUTPUT_TOPIC", "yelp-negative-reviews")
 

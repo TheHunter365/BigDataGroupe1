@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -20,148 +23,436 @@
   "links": [],
   "liveNow": false,
   "panels": [
-
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 100,
       "title": "📊 KPIs Principaux — Live + Batch",
       "type": "row"
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "green", "value": 100 }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 100
+              }
+            ]
+          },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
       "id": 1,
-      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
       "title": "🏪 Businesses (Live)",
       "type": "stat",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT count() AS \"Businesses\" FROM bigdata_db.businesses_live", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT count() AS \"Businesses\" FROM bigdata_db.businesses_live",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "green", "value": 1000 }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1000
+              }
+            ]
+          },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
       "id": 2,
-      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
       "title": "💬 Avis Reçus (Live)",
       "type": "stat",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT count(DISTINCT review_id) AS \"Avis\" FROM bigdata_db.reviews_live", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT count(DISTINCT review_id) AS \"Avis\" FROM bigdata_db.reviews_live",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "decimals": 2,
           "mappings": [],
           "max": 5,
           "min": 1,
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 3 }, { "color": "green", "value": 4 }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 3
+              },
+              {
+                "color": "green",
+                "value": 4
+              }
+            ]
+          },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
       "id": 3,
-      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
       "title": "⭐ Note Moyenne (Live)",
       "type": "stat",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT round(avg(stars), 2) AS \"Note\" FROM (SELECT DISTINCT review_id, stars FROM bigdata_db.reviews_live)", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT round(avg(stars), 2) AS \"Note\" FROM (SELECT DISTINCT review_id, stars FROM bigdata_db.reviews_live)",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "decimals": 1,
           "mappings": [],
           "max": 100,
           "min": 0,
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 50 }, { "color": "green", "value": 70 }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 70
+              }
+            ]
+          },
           "unit": "percent"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
       "id": 4,
-      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
       "title": "✅ Taux Ouverture (Live)",
       "type": "stat",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT round(100 * countIf(is_open = 1) / count(), 1) AS \"Ouverts\" FROM (SELECT DISTINCT business_id, is_open FROM bigdata_db.businesses_live)", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT round(100 * countIf(is_open = 1) / count(), 1) AS \"Ouverts\" FROM (SELECT DISTINCT business_id, is_open FROM bigdata_db.businesses_live)",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 10 }, { "color": "red", "value": 50 }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
       "id": 5,
-      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
       "title": "🚨 Alertes Négatives (Flink)",
       "type": "stat",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT count(DISTINCT business_id, date) AS \"Alertes\" FROM bigdata_db.negative_alerts_live", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT count() AS \"Alertes\" FROM bigdata_db.negative_alerts_live",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "purple", "value": 100000 }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "purple",
+                "value": 100000
+              }
+            ]
+          },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
       "id": 6,
-      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
       "title": "📦 Businesses Batch (SE3)",
       "type": "stat",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT count() AS \"Batch\" FROM bigdata_db.axe1_business_attributes", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT count() AS \"Batch\" FROM bigdata_db.axe1_business_attributes",
+          "refId": "A"
+        }
+      ]
     },
-
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
       "id": 101,
       "title": "⚡ Flux Temps Réel — Kafka → ClickHouse",
       "type": "row"
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
@@ -170,121 +461,312 @@
             "fillOpacity": 70,
             "gradientMode": "hue",
             "lineWidth": 1,
-            "stacking": { "group": "A", "mode": "none" }
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
           }
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 6
+      },
       "id": 7,
       "options": {
-        "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "📈 Avis Reçus par Heure (ingested_at)",
       "type": "timeseries",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT toStartOfHour(date) AS time, count(DISTINCT review_id) AS \"Avis\" FROM bigdata_db.reviews_live WHERE $__timeFilter(date) GROUP BY time ORDER BY time", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT toStartOfHour(date) AS time, count(DISTINCT review_id) AS \"Avis\" FROM bigdata_db.reviews_live WHERE $__timeFilter(date) GROUP BY time ORDER BY time",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
-          "custom": { "align": "auto", "displayMode": "auto", "inspect": false },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "stars" }, "properties": [{ "id": "displayName", "value": "Note" }, { "id": "custom.displayMode", "value": "color-background" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 3 }, { "color": "green", "value": 4 }] } }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "stars"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Note"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3
+                    },
+                    {
+                      "color": "green",
+                      "value": 4
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         ]
       },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 6
+      },
       "id": 8,
-      "options": { "showHeader": true, "footer": { "show": false } },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
       "title": "🚨 Dernières Alertes Négatives (Flink)",
       "type": "table",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT received_at AS \"Recu le\", business_id AS \"Business\", stars AS \"Note\", alert AS \"Alerte\" FROM bigdata_db.negative_alerts_live WHERE $__timeFilter(date) ORDER BY received_at DESC LIMIT 1 BY business_id, date LIMIT 50", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT received_at AS \"Recu le\", business_id AS \"Business\", stars AS \"Note\", alert AS \"Alerte\" FROM bigdata_db.negative_alerts_live WHERE $__timeFilter(received_at) ORDER BY received_at ASC LIMIT 50",
+          "refId": "A"
+        }
+      ]
     },
-
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
       "id": 102,
       "title": "🗺️ Géographie — 150 346 Businesses Yelp (Batch SE3)",
       "type": "row"
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
-      "fieldConfig": { "defaults": {}, "overrides": [] },
-      "gridPos": { "h": 12, "w": 14, "x": 0, "y": 15 },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 14,
+        "x": 0,
+        "y": 15
+      },
       "id": 9,
       "options": {
-        "view": { "allLayers": true, "id": "zero", "lat": 37.5, "lon": -99, "zoom": 4 },
-        "controls": { "mouseWheelZoom": true, "showAttribution": true, "showDebug": false, "showMeasure": false, "showScale": false, "showZoom": true },
+        "view": {
+          "allLayers": true,
+          "id": "zero",
+          "lat": 37.5,
+          "lon": -99,
+          "zoom": 4
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": false,
+          "showZoom": true
+        },
         "layers": [
           {
             "config": {
               "showLegend": true,
               "style": {
-                "color": { "fixed": "dark-blue" },
+                "color": {
+                  "fixed": "dark-blue"
+                },
                 "opacity": 0.5,
-                "size": { "fixed": 3, "max": 10, "min": 1 },
-                "symbol": { "fixed": "img/icons/marker/circle.svg", "mode": "fixed" }
+                "size": {
+                  "fixed": 3,
+                  "max": 10,
+                  "min": 1
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/circle.svg",
+                  "mode": "fixed"
+                }
               }
             },
-            "location": { "mode": "auto" },
+            "location": {
+              "mode": "auto"
+            },
             "name": "Businesses",
             "tooltip": true,
             "type": "markers"
           }
         ],
-        "tooltip": { "mode": "details" }
+        "tooltip": {
+          "mode": "details"
+        }
       },
       "title": "🗺️ Carte des Businesses (latitude / longitude)",
       "type": "geomap",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT latitude, longitude, name, city, state, round(stars, 1) AS stars, review_count FROM bigdata_db.axe1_business_attributes WHERE latitude != 0 AND longitude != 0 AND state IN (${state}) LIMIT 50000", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT latitude, longitude, name, city, state, round(stars, 1) AS stars, review_count FROM bigdata_db.axe1_business_attributes WHERE latitude != 0 AND longitude != 0 AND state IN (${state}) LIMIT 50000",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "hue", "lineWidth": 1 }
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          }
         },
         "overrides": []
       },
-      "gridPos": { "h": 12, "w": 10, "x": 14, "y": 15 },
+      "gridPos": {
+        "h": 12,
+        "w": 10,
+        "x": 14,
+        "y": 15
+      },
       "id": 10,
       "options": {
         "barWidth": 0.9,
         "fillOpacity": 80,
         "gradientMode": "hue",
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
         "orientation": "horizontal",
-        "tooltip": { "mode": "single", "sort": "none" },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 200
       },
       "title": "🏙️ Top 15 Villes par Nombre de Businesses",
       "type": "barchart",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT city AS \"Ville\", nb_businesses AS \"Businesses\", round(avg_stars, 2) AS \"Note Moy\" FROM bigdata_db.axe2_avg_by_city WHERE state IN (${state}) ORDER BY nb_businesses DESC LIMIT 15", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT city AS \"Ville\", nb_businesses AS \"Businesses\", round(avg_stars, 2) AS \"Note Moy\" FROM bigdata_db.axe2_avg_by_city WHERE state IN (${state}) ORDER BY nb_businesses DESC LIMIT 15",
+          "refId": "A"
+        }
+      ]
     },
-
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
       "id": 103,
       "title": "📉 Réputation — Analyse Batch (150K businesses · 3.4M lignes)",
       "type": "row"
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
@@ -303,281 +785,708 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 14, "x": 0, "y": 28 },
+      "gridPos": {
+        "h": 8,
+        "w": 14,
+        "x": 0,
+        "y": 28
+      },
       "id": 11,
       "options": {
-        "legend": { "calcs": ["mean", "min", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "mean",
+            "min",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "📈 Évolution Running Avg Note par Mois (agrégé — 3.4M lignes)",
       "type": "timeseries",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT toDateTime(makeDate(yr, mth, 1)) AS time, round(avg(running_avg), 3) AS \"Running Avg\", round(avg(avg_stars_month), 3) AS \"Avg Mensuel\" FROM bigdata_db.axe1_monthly_running_avg GROUP BY time ORDER BY time", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT toDateTime(makeDate(yr, mth, 1)) AS time, round(avg(running_avg), 3) AS \"Running Avg\", round(avg(avg_stars_month), 3) AS \"Avg Mensuel\" FROM bigdata_db.axe1_monthly_running_avg GROUP BY time ORDER BY time",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "hue", "lineWidth": 1 }
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          }
         },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Taux Fermeture %" }, "properties": [{ "id": "unit", "value": "percent" }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Taux Fermeture %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
         ]
       },
-      "gridPos": { "h": 8, "w": 10, "x": 14, "y": 28 },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 28
+      },
       "id": 12,
       "options": {
         "barWidth": 0.8,
         "fillOpacity": 80,
         "gradientMode": "hue",
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
         "orientation": "auto",
-        "tooltip": { "mode": "multi", "sort": "none" },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
         "xField": "Note",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 200
       },
       "title": "🔒 Taux Fermeture par Classe de Note (4 classes)",
       "type": "barchart",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT stars_bucket AS \"Note\", closure_rate_pct AS \"Taux Fermeture %\", closed AS \"Fermes\", total AS \"Total\" FROM bigdata_db.axe1_closure_rate ORDER BY stars_bucket", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT stars_bucket AS \"Note\", closure_rate_pct AS \"Taux Fermeture %\", closed AS \"Fermes\", total AS \"Total\" FROM bigdata_db.axe1_closure_rate ORDER BY stars_bucket",
+          "refId": "A"
+        }
+      ]
     },
-
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 36 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
       "id": 104,
       "title": "🏷️ Attributs & Structure — 150K Businesses Batch",
       "type": "row"
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 37 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 37
+      },
       "id": 13,
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["value", "percent"] },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
         "pieType": "donut",
-        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
-        "tooltip": { "mode": "single", "sort": "none" }
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "title": "⭐ Distribution des Notes (150K businesses)",
       "type": "piechart",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT concat(toString(toUInt8(stars)), ' etoile(s)') AS \"Note\", count() AS \"Total\" FROM bigdata_db.axe1_business_attributes WHERE state IN (${state}) GROUP BY stars ORDER BY stars", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT concat(toString(toUInt8(stars)), ' etoile(s)') AS \"Note\", count() AS \"Total\" FROM bigdata_db.axe1_business_attributes WHERE state IN (${state}) GROUP BY stars ORDER BY stars",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "continuous-GrYlRd" },
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
           "mappings": [],
           "max": 100,
           "min": 0,
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 30 }, { "color": "green", "value": 60 }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 30
+              },
+              {
+                "color": "green",
+                "value": 60
+              }
+            ]
+          },
           "unit": "percent"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 37 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 37
+      },
       "id": 14,
       "options": {
         "displayMode": "lcd",
         "minVizHeight": 10,
         "minVizWidth": 0,
         "orientation": "horizontal",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "showUnfilled": true,
         "text": {}
       },
       "title": "🔧 % Businesses avec Services (150K)",
       "type": "bargauge",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT round(100 * countIf(has_delivery = 1) / count(), 1) AS \"Livraison\", round(100 * countIf(has_takeout = 1) / count(), 1) AS \"A emporter\", round(100 * countIf(outdoor_seating = 1) / count(), 1) AS \"Terrasse\", round(100 * countIf(accepts_credit_cards = 1) / count(), 1) AS \"CB acceptee\", round(100 * countIf(bike_parking = 1) / count(), 1) AS \"Parking velo\", round(100 * countIf(good_for_kids = 1) / count(), 1) AS \"Enfants OK\", round(100 * countIf(accepts_reservations = 1) / count(), 1) AS \"Reservation\" FROM bigdata_db.axe1_business_attributes WHERE state IN (${state})", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT round(100 * countIf(has_delivery = 1) / count(), 1) AS \"Livraison\", round(100 * countIf(has_takeout = 1) / count(), 1) AS \"A emporter\", round(100 * countIf(outdoor_seating = 1) / count(), 1) AS \"Terrasse\", round(100 * countIf(accepts_credit_cards = 1) / count(), 1) AS \"CB acceptee\", round(100 * countIf(bike_parking = 1) / count(), 1) AS \"Parking velo\", round(100 * countIf(good_for_kids = 1) / count(), 1) AS \"Enfants OK\", round(100 * countIf(accepts_reservations = 1) / count(), 1) AS \"Reservation\" FROM bigdata_db.axe1_business_attributes WHERE state IN (${state})",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 37 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 37
+      },
       "id": 15,
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["value", "percent"] },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
         "pieType": "pie",
-        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
-        "tooltip": { "mode": "single", "sort": "none" }
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "title": "🏪 Ouvert vs Fermé (150K businesses)",
       "type": "piechart",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT if(is_open = 1, 'Ouvert', 'Ferme') AS \"Statut\", count() AS \"Total\" FROM bigdata_db.axe1_business_attributes WHERE state IN (${state}) GROUP BY is_open", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT if(is_open = 1, 'Ouvert', 'Ferme') AS \"Statut\", count() AS \"Total\" FROM bigdata_db.axe1_business_attributes WHERE state IN (${state}) GROUP BY is_open",
+          "refId": "A"
+        }
+      ]
     },
-
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 45 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 45
+      },
       "id": 105,
       "title": "👥 Analyse Sociale — Elite & Ancienneté (données partielles SE3)",
       "type": "row"
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "hue", "lineWidth": 1 }
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          }
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 46 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 46
+      },
       "id": 16,
       "options": {
         "barWidth": 0.7,
         "fillOpacity": 80,
         "gradientMode": "hue",
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
         "orientation": "auto",
-        "tooltip": { "mode": "multi", "sort": "none" },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
         "xField": "Statut",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 200
       },
       "title": "🏅 Elite vs Non-Elite — Comportement",
       "type": "barchart",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT if(is_elite, 'Elite', 'Non-Elite') AS \"Statut\", nb_reviews AS \"Avis\", round(avg_stars_given, 2) AS \"Note Moy\", round(avg_text_length, 0) AS \"Long. Texte\" FROM bigdata_db.axe3_elite_comparison ORDER BY is_elite DESC", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT if(is_elite, 'Elite', 'Non-Elite') AS \"Statut\", nb_reviews AS \"Avis\", round(avg_stars_given, 2) AS \"Note Moy\", round(avg_text_length, 0) AS \"Long. Texte\" FROM bigdata_db.axe3_elite_comparison ORDER BY is_elite DESC",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "hue", "lineWidth": 1 }
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          }
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 46 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 46
+      },
       "id": 17,
       "options": {
         "barWidth": 0.7,
         "fillOpacity": 80,
         "gradientMode": "hue",
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
         "orientation": "auto",
-        "tooltip": { "mode": "multi", "sort": "none" },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
         "xField": "Anciennete",
         "xTickLabelRotation": -15,
         "xTickLabelSpacing": 200
       },
       "title": "📅 Ancienneté du Compte vs Note Donnée",
       "type": "barchart",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT seniority_bucket AS \"Anciennete\", nb_reviews AS \"Avis\", round(avg_stars, 2) AS \"Note Moy\" FROM bigdata_db.axe3_seniority_analysis ORDER BY seniority_bucket", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT seniority_bucket AS \"Anciennete\", nb_reviews AS \"Avis\", round(avg_stars, 2) AS \"Note Moy\" FROM bigdata_db.axe3_seniority_analysis ORDER BY seniority_bucket",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
-          "custom": { "align": "auto", "displayMode": "auto", "inspect": true },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Note" }, "properties": [{ "id": "custom.displayMode", "value": "color-background" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 3 }, { "color": "green", "value": 4 }] } }] },
-          { "matcher": { "id": "byName", "options": "Date avis" }, "properties": [{ "id": "custom.width", "value": 120 }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Note"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3
+                    },
+                    {
+                      "color": "green",
+                      "value": 4
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Date avis"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          }
         ]
       },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 46 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 46
+      },
       "id": 18,
-      "options": { "showHeader": true, "footer": { "show": false } },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
       "title": "💬 Derniers Avis Reçus (Live)",
       "type": "table",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT date AS \"Date avis\", business_id AS \"Business\", stars AS \"Note\", useful AS \"Utile\", substring(text, 1, 60) AS \"Extrait\" FROM bigdata_db.reviews_live WHERE $__timeFilter(date) ORDER BY date DESC LIMIT 1 BY review_id LIMIT 20", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT date AS \"Date avis\", business_id AS \"Business\", stars AS \"Note\", useful AS \"Utile\", substring(text, 1, 60) AS \"Extrait\" FROM bigdata_db.reviews_live WHERE $__timeFilter(date) ORDER BY date ASC LIMIT 1 BY review_id LIMIT 20",
+          "refId": "A"
+        }
+      ]
     },
-
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 54 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 54
+      },
       "id": 106,
       "title": "⏰ Analyse Temporelle — Heure / Jour / Mois (données partielles SE3)",
       "type": "row"
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "hue", "lineWidth": 1 },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          },
           "max": 5,
           "min": 0
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 55 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 55
+      },
       "id": 19,
       "options": {
         "barWidth": 0.9,
         "fillOpacity": 80,
         "gradientMode": "hue",
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
         "orientation": "auto",
-        "tooltip": { "mode": "multi", "sort": "none" },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
         "xField": "Heure",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
       "title": "🕐 Note Moyenne par Heure de la Journée",
       "type": "barchart",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT hour AS \"Heure\", round(avg_stars, 2) AS \"Note Moy\", nb_reviews AS \"Avis\" FROM bigdata_db.axe4_stars_by_hour ORDER BY hour", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT hour AS \"Heure\", round(avg_stars, 2) AS \"Note Moy\", nb_reviews AS \"Avis\" FROM bigdata_db.axe4_stars_by_hour ORDER BY hour",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "hue", "lineWidth": 1 },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          },
           "max": 5,
           "min": 0
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 55 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 55
+      },
       "id": 20,
       "options": {
         "barWidth": 0.9,
         "fillOpacity": 80,
         "gradientMode": "hue",
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
         "orientation": "auto",
-        "tooltip": { "mode": "multi", "sort": "none" },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
         "xField": "Jour",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
       "title": "📅 Note Moyenne par Jour de la Semaine",
       "type": "barchart",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT multiIf(day_of_week=1,'Lun',day_of_week=2,'Mar',day_of_week=3,'Mer',day_of_week=4,'Jeu',day_of_week=5,'Ven',day_of_week=6,'Sam','Dim') AS \"Jour\", round(avg_stars, 2) AS \"Note Moy\", nb_reviews AS \"Avis\" FROM bigdata_db.axe4_stars_by_dow ORDER BY day_of_week", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT multiIf(day_of_week=1,'Lun',day_of_week=2,'Mar',day_of_week=3,'Mer',day_of_week=4,'Jeu',day_of_week=5,'Ven',day_of_week=6,'Sam','Dim') AS \"Jour\", round(avg_stars, 2) AS \"Note Moy\", nb_reviews AS \"Avis\" FROM bigdata_db.axe4_stars_by_dow ORDER BY day_of_week",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
@@ -589,27 +1498,860 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 55 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 55
+      },
       "id": 21,
       "options": {
-        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "📆 Tendance Mensuelle Checkins (SE3 Temporal)",
       "type": "timeseries",
-      "targets": [{ "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" }, "queryType": "sql", "rawSql": "SELECT toDateTime(makeDate(year, month, 1)) AS time, nb_reviews AS \"Checkins\", round(avg_stars, 2) AS \"Note\" FROM bigdata_db.axe4_monthly_trend ORDER BY time", "refId": "A" }]
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT toDateTime(makeDate(year, month, 1)) AS time, nb_reviews AS \"Checkins\", round(avg_stars, 2) AS \"Note\" FROM bigdata_db.axe4_monthly_trend ORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 63
+      },
+      "id": 107,
+      "title": "🛠️ Axe 1 — Impact Attributs (WiFi, Prix, Volume Avis)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 64
+      },
+      "id": 22,
+      "options": {
+        "barWidth": 0.7,
+        "fillOpacity": 80,
+        "gradientMode": "hue",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "WiFi",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 200
+      },
+      "title": "📶 Impact WiFi sur la Note",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT wifi AS \"WiFi\", round(avg(stars), 2) AS \"Note Moy\", count() AS \"Nb Commerces\" FROM bigdata_db.axe1_business_attributes WHERE wifi != 'unknown' AND state IN (${state}) GROUP BY wifi ORDER BY \"Note Moy\" DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 64
+      },
+      "id": 23,
+      "options": {
+        "barWidth": 0.7,
+        "fillOpacity": 80,
+        "gradientMode": "hue",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Gamme",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 200
+      },
+      "title": "💶 Impact Gamme de Prix sur la Note",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT price_range AS \"Gamme\", round(avg(stars), 2) AS \"Note Moy\", count() AS \"Nb Commerces\" FROM bigdata_db.axe1_business_attributes WHERE price_range != 'unknown' AND state IN (${state}) GROUP BY price_range ORDER BY price_range",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 64
+      },
+      "id": 24,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "colorByField": null,
+        "fillOpacity": 80,
+        "gradientMode": "none",
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "title": "Volume Avis vs Note Moyenne",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT\n    CASE\n        WHEN review_count < 10 THEN '1-9 avis'\n        WHEN review_count < 50 THEN '10-49 avis'\n        WHEN review_count < 100 THEN '50-99 avis'\n        WHEN review_count < 500 THEN '100-499 avis'\n        ELSE '500+ avis'\n    END AS \"Tranche Avis\",\n    round(avg(stars), 2) AS \"Note Moyenne\"\nFROM bigdata_db.axe1_business_attributes\nWHERE review_count > 0\nGROUP BY 1\nORDER BY min(review_count) ASC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 72
+      },
+      "id": 108,
+      "title": "🏙️ Axe 2 — Concurrence & Disparités par État",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 73
+      },
+      "id": 25,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "colorByField": null,
+        "fillOpacity": 80,
+        "gradientMode": "none",
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "title": "Concurrents 500m vs Note Moyenne",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT\n    CASE\n        WHEN nb_competitors_500m = 0 THEN '0'\n        WHEN nb_competitors_500m <= 3 THEN '1-3'\n        WHEN nb_competitors_500m <= 7 THEN '4-7'\n        WHEN nb_competitors_500m <= 15 THEN '8-15'\n        ELSE '15+'\n    END AS \"Concurrents 500m\",\n    round(avg(stars), 2) AS \"Note Moyenne\"\nFROM bigdata_db.business_enriched\nGROUP BY 1\nORDER BY min(nb_competitors_500m) ASC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 73
+      },
+      "id": 26,
+      "options": {
+        "barWidth": 0.7,
+        "fillOpacity": 80,
+        "gradientMode": "hue",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Etat",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 200
+      },
+      "title": "🗺️ Note Pondérée par État",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT state AS \"Etat\", round(sum(avg_stars * nb_businesses) / sum(nb_businesses), 2) AS \"Note Ponderee\", sum(nb_businesses) AS \"Total\" FROM bigdata_db.axe2_avg_by_city GROUP BY state ORDER BY \"Note Ponderee\" DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "stddev_stars"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Ecart-type"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.9
+                    },
+                    {
+                      "color": "red",
+                      "value": 1.1
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 81
+      },
+      "id": 27,
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "title": "Villes les plus Divisées (stddev_stars élevé, min 5 commerces)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT city AS \"Ville\", state AS \"Etat\", nb_businesses AS \"Commerces\", round(avg_stars, 2) AS \"Note Moy\", round(stddev_stars, 2) AS stddev_stars FROM bigdata_db.axe2_avg_by_city WHERE nb_businesses >= 5 ORDER BY stddev_stars DESC LIMIT 20",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 89
+      },
+      "id": 109,
+      "title": "🌐 Axe 3 — Influence & Réseau Social (PageRank, Elite, Fans)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 90
+      },
+      "id": 28,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "colorByField": null,
+        "fillOpacity": 80,
+        "gradientMode": "none",
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "title": "PageRank vs Votes Utiles Moyens",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT\n    CASE\n        WHEN pagerank < 0.0001 THEN 'Faible'\n        WHEN pagerank < 0.0005 THEN 'Moyen'\n        ELSE 'Eleve'\n    END AS \"Niveau PageRank\",\n    round(avg(useful), 2) AS \"Votes Utiles Moy\"\nFROM bigdata_db.axe3_user_review_enriched\nWHERE pagerank > 0\nGROUP BY 1\nORDER BY min(pagerank) ASC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Elite"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "Non": {
+                        "color": "blue",
+                        "index": 1
+                      },
+                      "Oui": {
+                        "color": "gold",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PageRank"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.001
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.002
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 90
+      },
+      "id": 29,
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "title": "🏆 Top 15 Influenceurs (PageRank)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT user_id AS \"User ID\", round(pagerank, 5) AS \"PageRank\", fans AS \"Fans\", friends_count AS \"Amis\", if(is_elite, 'Oui', 'Non') AS \"Elite\", round(average_stars, 2) AS \"Note Moy Donnee\" FROM bigdata_db.axe3_user_enriched ORDER BY pagerank DESC LIMIT 15",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 98
+      },
+      "id": 30,
+      "options": {
+        "barWidth": 0.7,
+        "fillOpacity": 80,
+        "gradientMode": "hue",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Fans",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 200
+      },
+      "title": "👥 Distribution des Fans (tranches)",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT multiIf(fans=0,'0 fans',fans<=5,'1-5 fans',fans<=20,'6-20 fans',fans<=100,'21-100 fans','100+ fans') AS \"Fans\", count() AS \"Utilisateurs\" FROM bigdata_db.axe3_user_enriched GROUP BY \"Fans\" ORDER BY \"Fans\"",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 106
+      },
+      "id": 110,
+      "title": "🕐 Axe 4 — Checkins : Heatmap Jour×Heure & Catégories",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-BlPu"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background",
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "purple",
+                "value": 5000
+              },
+              {
+                "color": "red",
+                "value": 9000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 14,
+        "x": 0,
+        "y": 107
+      },
+      "id": 31,
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "title": "🔥 Heatmap Checkins Jour × Heure (global)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT multiIf(day_of_week=1,'Lun',day_of_week=2,'Mar',day_of_week=3,'Mer',day_of_week=4,'Jeu',day_of_week=5,'Ven',day_of_week=6,'Sam','Dim') AS \"Jour\", hour AS \"Heure\", sum(total_checkins) AS \"Visites\" FROM bigdata_db.axe4_heatmap_global GROUP BY day_of_week, hour ORDER BY day_of_week, hour",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "drawStyle": "bars",
+            "fillOpacity": 70,
+            "gradientMode": "hue",
+            "lineWidth": 1,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 10,
+        "x": 14,
+        "y": 107
+      },
+      "id": 32,
+      "options": {
+        "barWidth": 0.5,
+        "fillOpacity": 70,
+        "gradientMode": "hue",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Heure",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 100
+      },
+      "title": "🍕 Checkins : Pizzerias vs Gastronomiques par Heure",
+      "type": "barchart",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_CLICKHOUSE}"
+          },
+          "queryType": "sql",
+          "rawSql": "SELECT hour AS \"Heure\", type AS \"Categorie\", total_checkins AS \"Visites\" FROM bigdata_db.axe4_category_hourly ORDER BY hour, type",
+          "refId": "A"
+        }
+      ]
     }
-
   ],
-
   "refresh": "30s",
   "schemaVersion": 38,
   "style": "dark",
-  "tags": ["SE5", "BigData", "Yelp", "S3", "Groupe1", "Lambda"],
+  "tags": [
+    "SE5",
+    "BigData",
+    "Yelp",
+    "S3",
+    "Groupe1",
+    "Lambda"
+  ],
   "templating": {
     "list": [
       {
-        "current": { "selected": true, "text": "ClickHouse", "value": "ClickHouse" },
+        "current": {
+          "selected": true,
+          "text": "ClickHouse",
+          "value": "ClickHouse"
+        },
         "hide": 0,
         "includeAll": false,
         "multi": false,
@@ -622,8 +2364,15 @@
         "type": "datasource"
       },
       {
-        "current": { "selected": true, "text": "All", "value": "$__all" },
-        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "${DS_CLICKHOUSE}"
+        },
         "definition": "SELECT DISTINCT state FROM bigdata_db.businesses_live ORDER BY state",
         "hide": 0,
         "includeAll": true,
@@ -631,7 +2380,7 @@
         "multi": true,
         "name": "state",
         "options": [],
-        "query": "SELECT DISTINCT state FROM bigdata_db.businesses_live ORDER BY state",
+        "query": "SELECT DISTINCT state FROM bigdata_db.axe1_business_attributes ORDER BY state",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -639,8 +2388,15 @@
         "type": "query"
       },
       {
-        "current": { "selected": true, "text": "All", "value": "$__all" },
-        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "${DS_CLICKHOUSE}"
+        },
         "definition": "SELECT DISTINCT city FROM bigdata_db.businesses_live WHERE state IN (${state}) ORDER BY city",
         "hide": 0,
         "includeAll": true,
@@ -648,7 +2404,7 @@
         "multi": true,
         "name": "city",
         "options": [],
-        "query": "SELECT DISTINCT city FROM bigdata_db.businesses_live WHERE state IN (${state}) ORDER BY city",
+        "query": "SELECT DISTINCT city FROM bigdata_db.axe1_business_attributes WHERE state IN (${state}) ORDER BY city",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -657,7 +2413,10 @@
       }
     ]
   },
-  "time": { "from": "now-5y", "to": "now" },
+  "time": {
+    "from": "now-5y",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "browser",
   "title": "SE5 — Dashboard Yelp Sprint 3",
